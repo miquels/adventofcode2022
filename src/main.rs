@@ -8,6 +8,7 @@ const DAYS: &'static [(u32, &str, u32, fn(&str), fn(&str))] = &[
     ( 3, "day-03-rucksack-reorganization", 2, day_03::part1, day_03::part2 ),
     ( 4, "day-04-camp-cleanup", 1, day_04::part1_2, day_04::part1_2 ),
     ( 5, "day-05-supply-stacks", 1, day_05::part1_2, day_05::part1_2 ),
+    ( 105, "day-05-supply-stacks", 1, day_05::part1_2_heavy_duty, day_05::part1_2 ),
 ];
 
 #[derive(Parser)]
@@ -29,7 +30,7 @@ fn day_parser(s: &str) -> Result<u32, String> {
         return Ok(0);
     }
     let day = s.parse::<u32>().map_err(|e| format!("{}", e))?;
-    if day < 1 || day > 25 {
+    if day < 1 {
         return Err(format!("invalid day: {}", s));
     }
     Ok(day)

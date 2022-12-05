@@ -112,3 +112,42 @@ day-05: part2: ZFSJBPRFP
 took 94.657µs
 ```
 
+### Tweakers challenge.
+
+On the [Tweakers.net](https://gathering.tweakers.net/forum/list_message/73693354#73693354)
+forum somebody posted 2 humungous alternative input files: one of 6 MB, and on of 88MB.
+
+I could run the 6 MB file in 700ms or so (after some tuning to change the `pop/push`
+pair in `cratemover_9000()` to a more batch-oriented method, like in `cratemover_9001`).
+However the 88MB file took 10 minutes to process!
+
+So I completely rewrote the algorithm. We now just take the position of the top
+crate of every stack, then run the commands _backwards_ and move those top crates
+as well if they are affected by the move.
+
+Result:
+
+- 6MB file:
+day-05: supply-stacks
+ == start ==
+day-105: read data: 20.130335ms
+day-105: part1: GATHERING
+day-105: part1: 5.029526ms
+day-015: part2: DEVSCHUUR
+day-105: part2: 4.47698ms
+took 29.83242ms
+
+day-05: supply-stacks
+ == start ==
+day-105: read data: 293.732768ms
+day-105: part1: KERSTBOOM
+day-105: part1: 66.429902ms
+day-015: part2: HENKLEEFT
+day-105: part2: 66.892431ms
+took 432.587119ms
+
+Much better.
+
+I've added this algorithm as 'day 105' so it's not used normally, as on the
+actual AOC puzzle input it's a bit slower (about 115.579µs).
+
