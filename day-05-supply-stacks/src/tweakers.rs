@@ -104,7 +104,7 @@ impl Stacks {
 
         while let Some(line) = lines.next() {
             let line = line.as_bytes();
-            if line[1] == b'1' {
+            if line[1] == b'0' || line[1] == b'1' {
                 lines.next();
                 break;
             }
