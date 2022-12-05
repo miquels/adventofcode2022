@@ -128,6 +128,8 @@ as well if they are affected by the move.
 Result:
 
 - 6MB file:
+
+```
 day-05: supply-stacks
  == start ==
 day-105: read data: 20.130335ms
@@ -136,7 +138,11 @@ day-105: part1: 5.029526ms
 day-015: part2: DEVSCHUUR
 day-105: part2: 4.47698ms
 took 29.83242ms
+```
 
+- 88MB file:
+
+```
 day-05: supply-stacks
  == start ==
 day-105: read data: 293.732768ms
@@ -145,6 +151,7 @@ day-105: part1: 66.429902ms
 day-015: part2: HENKLEEFT
 day-105: part2: 66.892431ms
 took 432.587119ms
+```
 
 Much better.
 
