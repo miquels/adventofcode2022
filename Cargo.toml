@@ -13,3 +13,4 @@ day-02 = { path = "day-02-rock-paper-scissors", version = "0.1.0" }
 day-03 = { path = "day-03-rucksack-reorganization", version = "0.1.0" }
 day-04 = { path = "day-04-camp-cleanup", version = "0.1.0" }
 day-05 = { path = "day-05-supply-stacks", version = "0.1.0" }
+day-06 = { path = "day-06-tuning-trouble", version = "0.1.0" }
