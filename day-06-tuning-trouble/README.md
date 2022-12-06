@@ -18,5 +18,18 @@ took 12.369µs
 
 ### Part 2.
 
+The exact same thing but for length 14.
+
+```
+day-06: tuning-trouble
+part1: == start ==
+part1: 1100
+part1: took 10.68µs
+part2: == start ==
+part2: 2421
+part2: took 27.332µs
+```
+
 ### Optimizations.
 
+TBD.

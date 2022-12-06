@@ -1,18 +1,28 @@
 pub fn part1(input: &str) {
-    let o = input
+    println!("part1: {}", find_marker(input, 4) + 4);
+}
+
+pub fn part2(input: &str) {
+    println!("part2: {}", find_marker(input, 14) + 14);
+}
+
+pub fn find_marker(input: &str, len: usize) -> usize {
+    input
         .as_bytes()
-        .windows(4)
+        .windows(len)
         .enumerate()
         .find_map(|(i, w)| all_different(w).then(|| i))
-        .unwrap();
-    println!("part1: {}", o + 4);
+        .unwrap()
 }
 
 fn all_different(w: &[u8]) -> bool {
-    w[0] != w[1] && w[0] != w[2] && w[0] != w[3] &&
-        w[1] != w[2] && w[1] != w[3] &&
-        w[2] != w[3]
+    for i in 0 .. w.len() - 1 {
+        for j in i + 1 .. w.len() {
+            if w[i] == w[j] {
+                return false;
+            }
+        }
+    }
+    true
 }
 
-pub fn part2(_input: &str) {
-}
