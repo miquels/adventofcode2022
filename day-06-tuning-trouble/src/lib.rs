@@ -16,13 +16,5 @@ pub fn find_marker(input: &str, len: usize) -> usize {
 }
 
 fn all_different(w: &[u8]) -> bool {
-    for i in 0 .. w.len() - 1 {
-        for j in i + 1 .. w.len() {
-            if w[i] == w[j] {
-                return false;
-            }
-        }
-    }
-    true
+    w.into_iter().fold(0u32, |set, v| set | 1 << (v - b'a')).count_ones() == w.len() as u32
 }
-
