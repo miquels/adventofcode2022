@@ -74,3 +74,20 @@ part2: == start ==
 part2: 2421
 part2: took 18.336µs
 ```
+
+One more optimization, telling the compiler to actually use the
+whole instruction set of the CPU:
+
+```
+$ RUSTFLAGS='-C target-cpu=native' cargo run --release -- --day 6
+day-06: tuning-trouble
+part1: == start ==
+part1: 1100
+part1: took 5.498µs
+part2: == start ==
+part2: 2421
+part2: took 9.909µs
+```
+
+Very interesting :)
+
