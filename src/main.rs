@@ -9,7 +9,7 @@ const DAYS: &'static [(u32, &str, u32, fn(&str), fn(&str))] = &[
     ( 4, "day-04-camp-cleanup", 1, day_04::part1_2, day_04::part1_2 ),
     ( 5, "day-05-supply-stacks", 1, day_05::part1_2, day_05::part1_2 ),
     ( 6, "day-06-tuning-trouble", 2, day_06::part1, day_06::part2 ),
-    ( 6, "day-07-no-space-left-on-device", 2, day_07::part1, day_07::part2 ),
+    ( 7, "day-07-no-space-left-on-device", 2, day_07::part1, day_07::part2 ),
     ( 105, "day-05-supply-stacks", 1, day_05::part1_2_heavy_duty, day_05::part1_2 ),
 ];
 
