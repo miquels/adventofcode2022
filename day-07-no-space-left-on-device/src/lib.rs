@@ -1,19 +1,32 @@
 use std::collections::HashMap;
+use std::time::Instant;
 
-pub fn part1(input: &str) {
+pub fn part1_2(input: &str) {
+    let now = Instant::now();
     let mut root = Directory::default();
     let _ = root.cd(true, input.lines());
-    let mut tot = 0;
-    root.walk(&mut |node| {
-        if node.size() < 100000 {
-            tot += node.size();
-        }
-    });
-    println!("part1: {}", tot);
-}
+    println!("part1: parsing: {:?}", now.elapsed());
 
-pub fn part2(_input: &str) {
-    println!("N/A");
+    let now = Instant::now();
+    println!("part1: {}", root
+        .iter()
+        .filter_map(|n| (n.size() < 100000).then(|| n.size()))
+        .sum::<u32>()
+    );
+    println!("part1: {:?}", now.elapsed());
+
+    let unused = 70000000 - root.size();
+    let to_delete = 30000000 - unused;
+
+    let now = Instant::now();
+    println!("part2 iter: {}",
+        root
+        .iter()
+        .filter_map(|n| (n.size() > to_delete).then(|| n.size()))
+        .min()
+        .unwrap()
+    );
+    println!("part2: {:?}", now.elapsed());
 }
 
 enum Mode {
@@ -81,7 +94,9 @@ impl Directory {
                 },
                 Mode::Ls => {
                     let (w1, w2) = (words.next().unwrap(), words.next().unwrap());
-                    self.entries.insert(w2.to_string(), Node::new(w1));
+                    if self.entries.insert(w2.to_string(), Node::new(w1)).is_some() {
+                        println!("DUP");
+                    }
                 },
             }
         }
@@ -92,12 +107,25 @@ impl Directory {
         self.entries.values().map(|n| n.size()).sum()
     }
 
-    fn walk(&self, f: &mut impl FnMut(&Node)) {
-        self.entries.values().for_each(|node| {
-            if let Node::Directory(subdir) = node {
-                f(node);
-                subdir.walk(f);
+    fn iter(&self) -> Walker<'_> {
+        Walker { entries: self.entries.values().collect() }
+    }
+}
+
+struct Walker<'a> {
+    entries: Vec<&'a Node>,
+}
+
+impl<'a> Iterator for Walker<'a> {
+    type Item = &'a Node;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        while let Some(node) = self.entries.pop() {
+            if let Node::Directory(ref d) = node {
+                self.entries.extend(d.entries.values());
+                return Some(node);
             }
-        });
+        }
+        None
     }
 }
