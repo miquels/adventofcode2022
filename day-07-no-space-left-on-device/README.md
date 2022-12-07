@@ -25,7 +25,45 @@ dir.iter().filter_map(|n| (n.size() > to_delete).then(|| n.size())).min()
 
 ### Optimizations.
 
-We use a `HashMap` for the directory, but actually, the names are not needed
-for the puzzle, and the puzzle input never visits a directory twice.
-So a `Vec` should suffice.
+We use a `HashMap` for the directory, but the map from `std` doesn't use
+the fastest hashing algoritm there is (for good reasons). We can swap
+the algorithm with one from the `rustc-hash` crate:
 
+Before:
+
+```
+parsing: 197.575µs
+part1: 1886043
+part1: 20.538µs
+part2: 3842121
+part2: 22.826µs
+took 288.656µs
+```
+
+After:
+
+```
+parsing: 152.918µs
+part1: 1886043
+part1: 21.581µs
+part2: 3842121
+part2: 24.214µs
+took 243.471µs
+```
+
+It is slightly faster. Now, perhaps we can get rid of String allocations,
+and refer to the input directly.
+
+```
+parsing: 138.581µs
+part1: 1886043
+part1: 21.412µs
+part2: 3842121
+part2: 26.911µs
+took 224.577µs
+```
+
+Slightly faster again. Maybe allocate the hashmap with a capacity?
+No, doesn't help. Only gets slower.
+
+I don't see a simple way to make this much faster, alas.

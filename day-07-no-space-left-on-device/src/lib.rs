@@ -1,11 +1,10 @@
-use std::collections::HashMap;
 use std::time::Instant;
+use rustc_hash::FxHashMap;
 
 pub fn part1_2(input: &str) {
     let now = Instant::now();
-    let mut root = Directory::default();
-    let _ = root.cd(true, input.lines());
-    println!("part1: parsing: {:?}", now.elapsed());
+    let root = Directory::parse(input);
+    println!("parsing: {:?}", now.elapsed());
 
     let now = Instant::now();
     println!("part1: {}", root
@@ -19,8 +18,7 @@ pub fn part1_2(input: &str) {
     let to_delete = 30000000 - unused;
 
     let now = Instant::now();
-    println!("part2 iter: {}",
-        root
+    println!("part2: {}", root
         .iter()
         .filter_map(|n| (n.size() > to_delete).then(|| n.size()))
         .min()
@@ -35,12 +33,12 @@ enum Mode {
 }
 
 #[derive(Debug)]
-enum Node {
+enum Node<'a> {
     File(u32),
-    Directory(Directory),
+    Directory(Directory<'a>),
 }
 
-impl Node {
+impl<'a> Node<'a> {
     fn new(type_: &str) -> Node {
         match type_.parse::<u32>() {
             Ok(size) => Node::File(size),
@@ -56,16 +54,22 @@ impl Node {
     }
 }
 
-#[derive(Default, Debug)]
-struct Directory {
-    entries: HashMap<String, Node>,
+#[derive(Debug, Default)]
+struct Directory<'a> {
+    entries: FxHashMap<&'a str, Node<'a>>,
 }
 
-impl Directory {
+impl<'a> Directory<'a> {
 
-    fn cd<'a, I>(&mut self, root: bool, mut input: I) -> I
+    fn parse(input: &'a str) -> Directory<'a> {
+        let mut root = Directory::default();
+        let _ = root.cd(true, input.lines());
+        root
+    }
+
+    fn cd<'i: 'a, I>(&mut self, root: bool, mut input: I) -> I
     where
-        I: Iterator<Item = &'a str>,
+        I: Iterator<Item = &'i str>,
     {
         let mut mode = Mode::Cmd;
         while let Some(mut line) = input.next() {
@@ -94,9 +98,7 @@ impl Directory {
                 },
                 Mode::Ls => {
                     let (w1, w2) = (words.next().unwrap(), words.next().unwrap());
-                    if self.entries.insert(w2.to_string(), Node::new(w1)).is_some() {
-                        println!("DUP");
-                    }
+                    self.entries.insert(w2, Node::new(w1));
                 },
             }
         }
@@ -113,11 +115,11 @@ impl Directory {
 }
 
 struct Walker<'a> {
-    entries: Vec<&'a Node>,
+    entries: Vec<&'a Node<'a>>,
 }
 
 impl<'a> Iterator for Walker<'a> {
-    type Item = &'a Node;
+    type Item = &'a Node<'a>;
 
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(node) = self.entries.pop() {
