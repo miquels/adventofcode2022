@@ -32,31 +32,10 @@ enum Mode {
     Ls,
 }
 
-#[derive(Debug)]
-enum Node<'a> {
-    File(u32),
-    Directory(Directory<'a>),
-}
-
-impl<'a> Node<'a> {
-    fn new(type_: &str) -> Node {
-        match type_.parse::<u32>() {
-            Ok(size) => Node::File(size),
-            Err(_) => Node::Directory(Directory::default()),
-        }
-    }
-
-    fn size(&self) -> u32 {
-        match self {
-            Node::File(size) => *size,
-            Node::Directory(dir) => dir.size(),
-        }
-    }
-}
-
 #[derive(Debug, Default)]
 struct Directory<'a> {
-    entries: FxHashMap<&'a str, Node<'a>>,
+    entries: FxHashMap<&'a str, Directory<'a>>,
+    size: u32,
 }
 
 impl<'a> Directory<'a> {
@@ -85,8 +64,10 @@ impl<'a> Directory<'a> {
                             match words.next().unwrap() {
                                 ".." => if !root { return input },
                                 name => match self.entries.get_mut(name) {
-                                    Some(Node::Directory(dir)) => input = dir.cd(false, input),
-                                    Some(_) => panic!("cd into a file: {}", name),
+                                    Some(dir) => {
+                                        input = dir.cd(false, input);
+                                        self.size += dir.size;
+                                    },
                                     None if root => {},
                                     None => panic!("no such directory: {}", name),
                                 },
@@ -98,7 +79,12 @@ impl<'a> Directory<'a> {
                 },
                 Mode::Ls => {
                     let (w1, w2) = (words.next().unwrap(), words.next().unwrap());
-                    self.entries.insert(w2, Node::new(w1));
+                    match w1.parse::<u32>() {
+                        Ok(size) => self.size += size,
+                        Err(_) => {
+                            self.entries.insert(w2, Directory::default());
+                        },
+                    }
                 },
             }
         }
@@ -106,27 +92,25 @@ impl<'a> Directory<'a> {
     }
 
     fn size(&self) -> u32 {
-        self.entries.values().map(|n| n.size()).sum()
+        self.size
     }
 
-    fn iter(&self) -> Walker<'_> {
-        Walker { entries: self.entries.values().collect() }
+    fn iter(&self) -> DirectoryIterator<'_> {
+        DirectoryIterator { entries: self.entries.values().collect() }
     }
 }
 
-struct Walker<'a> {
-    entries: Vec<&'a Node<'a>>,
+struct DirectoryIterator<'a> {
+    entries: Vec<&'a Directory<'a>>,
 }
 
-impl<'a> Iterator for Walker<'a> {
-    type Item = &'a Node<'a>;
+impl<'a> Iterator for DirectoryIterator<'a> {
+    type Item = &'a Directory<'a>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        while let Some(node) = self.entries.pop() {
-            if let Node::Directory(ref d) = node {
-                self.entries.extend(d.entries.values());
-                return Some(node);
-            }
+        while let Some(dir) = self.entries.pop() {
+            self.entries.extend(dir.entries.values());
+            return Some(dir);
         }
         None
     }

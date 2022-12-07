@@ -63,7 +63,18 @@ part2: 26.911µs
 took 224.577µs
 ```
 
-Slightly faster again. Maybe allocate the hashmap with a capacity?
-No, doesn't help. Only gets slower.
+Wait a minute. This isn't a real filesystem, we don't need to remember
+any file itself .. only the total size of all files in a directory.
 
-I don't see a simple way to make this much faster, alas.
+So now:
+
+```
+parsing: 98.953µs
+part1: 1886043
+part1: 9.365µs
+part2: 3842121
+part2: 3.55µs
+took 129.38µs
+```
+
+Better.
