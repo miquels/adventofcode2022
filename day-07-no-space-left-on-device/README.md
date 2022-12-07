@@ -78,3 +78,35 @@ took 129.38µs
 ```
 
 Better.
+
+### Optimization: no HashMaps at all.
+
+We know from the input that a directory is never visited twice. All we do is
+recursively visit each directory. So we don't need to remember filenames
+at all. A simple growing `Vec`, one for each directory, will do. Every time
+we enter a new directory, we push a new counter-value onto the Vec and that
+is the counter for the current directory. When we're done, we return that
+counter., so that the parent can add that to _its_ total.
+
+parsing: 60.787µs
+part1: 1886043
+part1: 1.592µs
+part2: 3842121
+part2: 1.368µs
+took 75.665µs
+
+Can we go faster? Well, yes! If we throw out all the `&str`s and replace
+them with `&[u8]` e.g. byte slices, and use a hand-written `atoi`:
+
+part1: 1886043
+part2: 3842121
+took 42.234µs
+
+I took out some measurements, because those too were slowing the thing down.
+
+Can we go faster? Well we could remove the recursion and just use a stack:
+
+part1: 1886043
+part2: 3842121
+took 37.761µs
+

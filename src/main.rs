@@ -9,7 +9,7 @@ const DAYS: &'static [(u32, &str, u32, fn(&str), fn(&str))] = &[
     ( 4, "day-04-camp-cleanup", 1, day_04::part1_2, day_04::part1_2 ),
     ( 5, "day-05-supply-stacks", 1, day_05::part1_2, day_05::part1_2 ),
     ( 6, "day-06-tuning-trouble", 2, day_06::part1, day_06::part2 ),
-    ( 7, "day-07-no-space-left-on-device", 1, day_07::part1_2, day_07::part1_2 ),
+    ( 7, "day-07-no-space-left-on-device", 1, day_07::part1_2_notree, day_07::part1_2 ),
     ( 105, "day-05-supply-stacks", 1, day_05::part1_2_heavy_duty, day_05::part1_2 ),
 ];
 
@@ -51,7 +51,7 @@ fn main() {
     let mut tot_elapsed = Duration::from_secs(0);
 
     for (day, dir, nparts, part1, part2) in DAYS {
-        if opts.day == 0 || opts.day == *day {
+        if (opts.day == 0 && *day < 100) || opts.day == *day {
             eprintln!("{}: {}", &dir[..6], &dir[7..]);
             let file = format!("{}/input/{}", dir, opts.input);
             let input = read_to_string(&file).expect(&file);
