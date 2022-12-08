@@ -64,4 +64,18 @@ part2: 486540
 part2: took 393.095µs
 ```
 
-Better.
+Better. For fun, lets play with `unsafe` and see what happens if we use
+`get_unchecked()` in `height()`.
+
+```
+part1: == start ==
+part1: 1684
+part1: took 39.675µs
+part2: == start ==
+part2: 486540
+part2: took 334.304µs
+```
+
+That certainly helps. Wait, I think I hear the Rust Safety Police marching
+into my neighborhood. Better hide the evidence! Not committed.
+

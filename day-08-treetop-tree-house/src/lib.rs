@@ -14,10 +14,6 @@ struct Trees<'i, const DIM: usize> {
 }
 
 impl<'i, const DIM: usize> Trees<'i, DIM> {
-    const fn dim(&self) -> i32 {
-        DIM as i32
-    }
-
     // part1.
     fn count_visible(&mut self) -> u32 {
         let mut visible = 0;
@@ -61,13 +57,12 @@ impl<'i, const DIM: usize> Trees<'i, DIM> {
 
     // part2
     fn count_scenery(&self) -> u32 {
-        let mut scenic = 0;
-        for y in 1 .. self.dim() - 1 {
-            for x in 1 .. self.dim() - 1 {
-                scenic = std::cmp::max(self.look_around(x, y), scenic);
-            }
-        }
-        scenic
+        (1 .. self.dim() - 1).map(|y| {
+            (1 .. self.dim() - 1).map(move |x| self.look_around(x, y))
+        })
+        .flatten()
+        .max()
+        .unwrap()
     }
 
     fn look_around(&self, mut x: i32, mut y: i32) -> u32 {
@@ -80,18 +75,13 @@ impl<'i, const DIM: usize> Trees<'i, DIM> {
             (0, 1, self.dim() - y)
         ] {
             (x, y) = (ox + dx, oy + dy);
-            for i in 1 .. self.dim() as u32 {
-                if i == max as u32 {
-                    scenic *= std::cmp::max(1, i - 1);
-                    break;
-                }
-                if self.height(x, y) >= h {
-                    scenic *= i;
-                    break;
-                }
+            let mut i = 1;
+            while i < max as u32 && self.height(x, y) < h {
                 x += dx;
                 y += dy;
+                i += 1;
             }
+            scenic *= std::cmp::max(1, i - (i == max as u32) as u32);
         }
         scenic
     }
@@ -102,11 +92,15 @@ impl<'i, const DIM: usize> Trees<'i, DIM> {
 
     fn new(input: &str) -> Trees<DIM> {
         let input = input.as_bytes();
-        // let dim = input.iter().position(|&b| b == b'\n').unwrap() as i32;
         let trees = Trees {
             seen: [[false; DIM]; DIM],
             input,
         };
         trees
     }
+
+    const fn dim(&self) -> i32 {
+        DIM as i32
+    }
+
 }
