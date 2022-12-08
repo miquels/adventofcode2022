@@ -15,7 +15,7 @@ struct Trees<'i, const DIM: usize> {
 
 impl<'i, const DIM: usize> Trees<'i, DIM> {
     // part1.
-    fn count_visible(&mut self) -> u32 {
+    fn count_visible(&mut self) -> i32 {
         let mut visible = 0;
         for p in 0..self.dim() {
             visible += self.look_along(p, 0, 0, 1);
@@ -26,7 +26,7 @@ impl<'i, const DIM: usize> Trees<'i, DIM> {
         visible
     }
 
-    fn look_along(&mut self, mut x: i32, mut y: i32, dx: i32, dy: i32) -> u32 {
+    fn look_along(&mut self, mut x: i32, mut y: i32, dx: i32, dy: i32) -> i32 {
         let mut highest = 0;
         let mut visible = 0;
         for _ in 0 .. self.dim() {
@@ -56,7 +56,7 @@ impl<'i, const DIM: usize> Trees<'i, DIM> {
     }
 
     // part2
-    fn count_scenery(&self) -> u32 {
+    fn count_scenery(&self) -> i32 {
         (1 .. self.dim() - 1).map(|y| {
             (1 .. self.dim() - 1).map(move |x| self.look_around(x, y))
         })
@@ -65,23 +65,21 @@ impl<'i, const DIM: usize> Trees<'i, DIM> {
         .unwrap()
     }
 
-    fn look_around(&self, mut x: i32, mut y: i32) -> u32 {
-        let mut scenic = 1;
-        let (ox, oy, h) = (x, y, self.height(x, y));
+    fn look_around(&self, x: i32, y: i32) -> i32 {
+        let (h, mut scenic) = (self.height(x, y), 1);
         for (dx, dy, max) in [
             (0, -1, y + 1),
             (-1, 0, x + 1),
             (1, 0, self.dim() - x),
             (0, 1, self.dim() - y)
         ] {
-            (x, y) = (ox + dx, oy + dy);
-            let mut i = 1;
-            while i < max as u32 && self.height(x, y) < h {
+            let (mut x, mut y, mut i) = (x + dx, y + dy, 1);
+            while i < max && self.height(x, y) < h {
                 x += dx;
                 y += dy;
                 i += 1;
             }
-            scenic *= std::cmp::max(1, i - (i == max as u32) as u32);
+            scenic *= std::cmp::max(1, i - (i == max) as i32);
         }
         scenic
     }
@@ -102,5 +100,4 @@ impl<'i, const DIM: usize> Trees<'i, DIM> {
     const fn dim(&self) -> i32 {
         DIM as i32
     }
-
 }
