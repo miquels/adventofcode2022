@@ -27,12 +27,65 @@ with as head the knot in front and as tail the knot behind it.
 
 All that stepping isn't very fast:
 
+```
 parsing: 102.937µs
 part1: 5874
 part1: 696.678µs
 part2: 2467
 part2: 654.306µs
 took 1.468628ms
+```
 
 Interestingly, part2 isn't slower than one, which you would expect.
 
+The first optimization we can do is to step the head all at once instead
+of one step at a time. That makes a difference, if not much:
+
+```
+parsing: 105.633µs
+part1: 5874
+part1: 677.689µs
+part2: 2467
+part2: 655.186µs
+took 1.453947ms
+```
+
+Still it looks like much of the CPU time is going somewhere else. What if we
+comment out the `HashSet.insert` ? The result will be wrong but it's just
+to get an idea of the time taken bij the HashSet inserts:
+
+Well:
+
+```
+parsing: 102.947µs
+part1: 1
+part1: 75.21µs
+part2: 1
+part2: 366.287µs
+```
+
+Woah. Look at the reduction in runtime for part1. Let's replace the `Hasher`
+used by `HashSet` with a faster one from the `FxHash` crate.
+
+```
+parsing: 89.635µs
+part1: 5874
+part1: 357.323µs
+part2: 2467
+part2: 433.539µs
+took 893.669µs
+```
+
+Okay, that helps. Still not very convincing but hey. Let's implement our
+own CoordHashSet based on a `Vec<u64>`:
+
+```
+parsing: 120.96µs
+part1: 5874
+part1: 124.36µs
+part2: 2467
+part2: 335.268µs
+took 597.1µs
+```
+
+Significantly better.
