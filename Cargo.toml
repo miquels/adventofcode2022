@@ -16,3 +16,4 @@ day-05 = { path = "day-05-supply-stacks", version = "0.1.0" }
 day-06 = { path = "day-06-tuning-trouble", version = "0.1.0" }
 day-07 = { path = "day-07-no-space-left-on-device", version = "0.1.0" }
 day-08 = { path = "day-08-treetop-tree-house", version = "0.1.0" }
+day-09 = { path = "day-09-rope-bridge", version = "0.1.0" }
