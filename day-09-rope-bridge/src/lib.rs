@@ -1,9 +1,20 @@
 use std::collections::HashSet;
+use std::time::Instant;
 
-pub fn part1(input: &str) {
+pub fn part1_2(input: &str) {
+    let now = Instant::now();
     let mut stepper = Stepper::new(input);
-    stepper.run();
+    println!("parsing: {:?}", now.elapsed());
+
+    let now = Instant::now();
+    stepper.run(2);
     println!("part1: {}", stepper.visited.len());
+    println!("part1: {:?}", now.elapsed());
+
+    let now = Instant::now();
+    stepper.run(10);
+    println!("part2: {}", stepper.visited.len());
+    println!("part2: {:?}", now.elapsed());
 }
 
 #[derive(Clone)]
@@ -31,16 +42,23 @@ struct Stepper {
     step_idx: usize,
     curstep: Step,
     visited: HashSet<Pos>,
-    head: Pos,
-    tail: Pos,
+    knots: [Pos; 10],
+    nknots: usize,
 }
 
 impl Stepper {
-    fn run(&mut self) {
+    fn run(&mut self, nknots: usize) {
+        // reset.
+        self.step_idx = 0;
+        self.curstep = self.steps[0].clone();
+        self.visited = HashSet::from([Pos::default()]);
+        self.knots = [Pos::default(); 10];
+
+        self.nknots = nknots;
         let mut stepping = true;
         while stepping {
             stepping = self.step_head();
-            self.step_tail();
+            self.step_tails();
         }
     }
 
@@ -62,17 +80,17 @@ impl Stepper {
             visited: HashSet::from([Pos::default()]),
             steps,
             step_idx: 0,
-            head: Pos::default(),
-            tail: Pos::default(),
+            knots: [Pos::default(); 10],
+            nknots: 2,
         }
     }
 
     fn step_head(&mut self) -> bool {
         let a = match &mut self.curstep {
-            Step::L(a) => { self.head.x -= 1; a },
-            Step::R(a) => { self.head.x += 1; a },
-            Step::U(a) => { self.head.y += 1; a },
-            Step::D(a) => { self.head.y -= 1; a },
+            Step::L(a) => { self.knots[0].x -= 1; a },
+            Step::R(a) => { self.knots[0].x += 1; a },
+            Step::U(a) => { self.knots[0].y += 1; a },
+            Step::D(a) => { self.knots[0].y -= 1; a },
         };
         *a -= 1;
         if *a == 0 {
@@ -85,19 +103,24 @@ impl Stepper {
         true
     }
 
-    fn step_tail(&mut self) {
-        if !self.tail.near(&self.head) {
-            if self.tail.y > self.head.y {
-                self.tail.y -= 1;
-            } else if self.tail.y < self.head.y {
-                self.tail.y += 1;
-            }
-            if self.tail.x > self.head.x {
-                self.tail.x -= 1;
-            } else if self.tail.x < self.head.x {
-                self.tail.x += 1;
+    fn step_tails(&mut self) {
+        for i in 1 .. self.nknots {
+            let head = &self.knots[i - 1];
+            let mut tail = self.knots[i];
+            if !tail.near(&head) {
+                if tail.y > head.y {
+                    tail.y -= 1;
+                } else if tail.y < head.y {
+                    tail.y += 1;
+                }
+                if tail.x > head.x {
+                    tail.x -= 1;
+                } else if tail.x < head.x {
+                    tail.x += 1;
+                }
+                self.knots[i] = tail;
             }
         }
-        self.visited.insert(self.tail);
+        self.visited.insert(self.knots[self.nknots-1]);
     }
 }
