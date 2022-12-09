@@ -89,3 +89,10 @@ took 597.1µs
 ```
 
 Significantly better.
+
+There are still two things to optimize:
+
+- the parser phase, as usual, by using &[u8] and a hand-made number parser
+- `step_tails()` could probably take larger steps than one-by-one
+
+However, it's friday afternoon and I'm going to socialize!

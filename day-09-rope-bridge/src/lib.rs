@@ -55,10 +55,38 @@ impl Stepper {
         self.nknots = nknots;
         let mut done = false;
         while !done {
-            let steps;
-            (steps, done) = self.step_head();
-            self.step_tails(steps);
+            done = self.step_head();
+            self.step_tails();
         }
+    }
+
+    fn step_head(&mut self) -> bool {
+        match self.steps[self.step_idx] {
+            Step::L(a) => self.knots[0].x -= a,
+            Step::R(a) => self.knots[0].x += a,
+            Step::U(a) => self.knots[0].y += a,
+            Step::D(a) => self.knots[0].y -= a,
+        };
+        self.step_idx += 1;
+        self.step_idx == self.steps.len()
+    }
+
+    fn step_tails(&mut self) {
+        while {
+            let mut stepped = false;
+            for i in 1 .. self.nknots {
+                let head = &self.knots[i - 1];
+                let mut tail = self.knots[i];
+                if !tail.near(&head) {
+                    tail.x += (head.x - tail.x).signum();
+                    tail.y += (head.y - tail.y).signum();
+                    self.knots[i] = tail;
+                    stepped = true;
+                }
+            }
+            self.visited.insert(self.knots[self.nknots-1]);
+            stepped
+        } {}
     }
 
     fn new(input: &str) -> Stepper {
@@ -100,46 +128,9 @@ impl Stepper {
             nknots: 2,
         }
     }
-
-    fn step_head(&mut self) -> (i32, bool) {
-        let a = match self.steps[self.step_idx] {
-            Step::L(a) => { self.knots[0].x -= a; a },
-            Step::R(a) => { self.knots[0].x += a; a },
-            Step::U(a) => { self.knots[0].y += a; a },
-            Step::D(a) => { self.knots[0].y -= a; a },
-        };
-        self.step_idx += 1;
-        if self.step_idx == self.steps.len() {
-            (a, true)
-        } else {
-            (a, false)
-        }
-    }
-
-    fn step_tails(&mut self, nsteps: i32) {
-        for _ in 0 .. nsteps {
-            for i in 1 .. self.nknots {
-                let head = &self.knots[i - 1];
-                let mut tail = self.knots[i];
-                if !tail.near(&head) {
-                    if tail.y > head.y {
-                        tail.y -= 1;
-                    } else if tail.y < head.y {
-                        tail.y += 1;
-                    }
-                    if tail.x > head.x {
-                        tail.x -= 1;
-                    } else if tail.x < head.x {
-                        tail.x += 1;
-                    }
-                    self.knots[i] = tail;
-                }
-            }
-            self.visited.insert(self.knots[self.nknots-1]);
-        }
-    }
 }
 
+// This is a _lot_ faster than HashSet<(i32, i32)>.
 struct CoordHashSet {
     min_x:  i32,
     min_y:  i32,
@@ -184,6 +175,5 @@ impl CoordHashSet {
         self.set.iter_mut().for_each(|x| x.fill(0));
         self.len = 0;
     }
-
 }
 
