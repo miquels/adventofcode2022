@@ -16,57 +16,44 @@ pub fn part1_2(input: &str) {
     println!("part2: {:?}", now.elapsed());
 }
 
-#[derive(Clone)]
-enum Step {
-    L(i32),
-    R(i32),
-    U(i32),
-    D(i32),
-}
-
 #[derive(Default, Clone, Copy, Hash, PartialEq, Eq)]
-struct Pos {
+struct Coord {
     x: i32,
     y: i32,
 }
 
-impl Pos {
-    fn near(&self, other: &Pos) -> bool {
+impl Coord {
+    fn near(&self, other: &Coord) -> bool {
         self.x.abs_diff(other.x) <= 1 && self.y.abs_diff(other.y) <= 1
     }
 }
 
 struct Stepper {
-    steps: Vec<Step>,
+    steps: Vec<(i32, i32)>,
     step_idx: usize,
-    visited: CoordHashSet,
-    knots: [Pos; 10],
+    visited: CoordSet,
+    knots: [Coord; 10],
     nknots: usize,
 }
 
 impl Stepper {
     fn run(&mut self, nknots: usize) {
-        // reset.
         self.step_idx = 0;
         self.visited.clear();
-        self.visited.insert(Pos::default());
-        self.knots = [Pos::default(); 10];
-
+        self.knots.fill(Coord::default());
         self.nknots = nknots;
-        let mut done = false;
-        while !done {
-            done = self.step_head();
+
+        while {
+            let done = self.step_head();
             self.step_tails();
-        }
+            !done
+        } {}
     }
 
     fn step_head(&mut self) -> bool {
-        match self.steps[self.step_idx] {
-            Step::L(a) => self.knots[0].x -= a,
-            Step::R(a) => self.knots[0].x += a,
-            Step::U(a) => self.knots[0].y += a,
-            Step::D(a) => self.knots[0].y -= a,
-        };
+        let (dx, dy) = self.steps[self.step_idx];
+        self.knots[0].x += dx;
+        self.knots[0].y += dy;
         self.step_idx += 1;
         self.step_idx == self.steps.len()
     }
@@ -90,79 +77,49 @@ impl Stepper {
     }
 
     fn new(input: &str) -> Stepper {
-        let (mut min_x, mut max_x, mut min_y, mut max_y) = (0, 0, 0, 0);
         let mut steps = Vec::new();
-        let mut pos = Pos::default();
+        let mut visited = CoordSet::default();
         for line in input.lines() {
             let (s, a) = line.split_once(' ').unwrap();
             let a = a.parse::<i32>().unwrap();
-            steps.push(match s {
-                "L" => {
-                    pos.x -= a;
-                    Step::L(a)
-                },
-                "R" => {
-                    pos.x += a;
-                    Step::R(a)
-                },
-                "U" => {
-                    pos.y += a;
-                    Step::U(a)
-                },
-                "D" => {
-                    pos.y -= a;
-                    Step::D(a)
-                },
+            let (dx, dy) = match s {
+                "L" => (-a, 0),
+                "R" => (a, 0),
+                "U" => (0, -a),
+                "D" => (0, a),
                 x => panic!("unknown step {}", x),
-            });
-            if pos.x < min_x { min_x = pos.x }
-            if pos.y < min_y { min_y = pos.y }
-            if pos.x > max_x { max_x = pos.x }
-            if pos.y > max_y { max_y = pos.y }
+            };
+            steps.push((dx, dy));
+            visited.expand(dx, dy);
         }
         Stepper {
             steps,
+            visited,
             step_idx: 0,
-            visited: CoordHashSet::new(min_x, min_y, max_x, max_y),
-            knots: [Pos::default(); 10],
+            knots: [Coord::default(); 10],
             nknots: 2,
         }
     }
 }
 
 // This is a _lot_ faster than HashSet<(i32, i32)>.
-struct CoordHashSet {
+#[derive(Default)]
+struct CoordSet {
     min_x:  i32,
     min_y:  i32,
+    max_x:  i32,
+    max_y:  i32,
+    coord:  Coord,
     len:    i32,
     set:    Vec<Vec<u64>>,
 }
 
-impl CoordHashSet {
-    fn new(min_x: i32, min_y: i32, max_x: i32, max_y: i32) -> CoordHashSet {
-        let set = (min_y .. max_y).map(|_| {
-            let mut v = Vec::new();
-            v.resize(((max_x - min_x) / 64) as usize + 1, 0);
-            v
-        }).collect();
-        CoordHashSet {
-            min_x,
-            min_y,
-            len: 0,
-            set,
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len as usize
-    }
-
-    fn insert(&mut self, pos: Pos) -> bool {
-        let y_idx = (pos.y - self.min_y) as usize;
-        let x_idx = (pos.x - self.min_x) as usize / 64;
-        let x_bit = 1 << ((pos.x - self.min_x) as u32 & 63);
-        let v = &mut self.set[y_idx];
-        let v = v.get_mut(x_idx).unwrap();
+impl CoordSet {
+    fn insert(&mut self, coord: Coord) -> bool {
+        let y_idx = (coord.y - self.min_y) as usize;
+        let x_idx = (coord.x - self.min_x) as usize / 64;
+        let x_bit = 1u64 << ((coord.x - self.min_x) as u32 & 63);
+        let v = self.set[y_idx].get_mut(x_idx).unwrap();
         if (*v & x_bit) == x_bit {
             return true;
         }
@@ -171,9 +128,24 @@ impl CoordHashSet {
         false
     }
 
+    fn len(&self) -> usize {
+        self.len as usize
+    }
+
     fn clear(&mut self) {
-        self.set.iter_mut().for_each(|x| x.fill(0));
+        let xz = ((self.max_x - self.min_x) / 64) as usize + 1;
+        self.set.resize((self.max_y - self.min_x) as usize, Vec::new());
+        self.set.iter_mut().for_each(|x| { x.truncate(0); x.resize(xz, 0) });
         self.len = 0;
+    }
+
+    fn expand(&mut self, dx: i32, dy: i32) {
+        self.coord.x += dx;
+        self.coord.y += dy;
+        if self.coord.x < self.min_x { self.min_x = self.coord.x }
+        if self.coord.y < self.min_y { self.min_y = self.coord.y }
+        if self.coord.x > self.max_x { self.max_x = self.coord.x }
+        if self.coord.y > self.max_y { self.max_y = self.coord.y }
     }
 }
 
