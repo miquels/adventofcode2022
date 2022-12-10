@@ -22,6 +22,14 @@ to need the same data in part2 so storing it in a Vec is better.
 ### Part 1.
 
 Find signal strengths during cycles 20, 60, 100, 140, 180, 220 and add 'm up.
+See code.
 
 ### Part 2.
+
+Run a ZX81-ULA-like algorithm to correlate the values of X during clockcycles
+1..240 with the X position of a CRT size 40x6. See code.
+
+### Optimization.
+
+Part1 + part2 runs in 17.738µs, so not much left to optimize.
 
