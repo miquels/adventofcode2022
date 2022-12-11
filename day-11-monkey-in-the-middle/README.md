@@ -23,3 +23,57 @@ how many items have they thrown).
 
 ### Part 2.
 
+Same thing, slightly different algorithm, 10000 rounds.
+
+This got problematic. The numbers got way too big. At first I tried to use the
+`num-bigint` crate, but I quickly found out that that was going to take ..
+days? years? anyway, a lot of time.
+
+So the test for each item that decides where the monkey is going to
+throw the next item is "divisible by N". It occured to me that we could
+simply limit the worry level of each item by taking mod(product of all N's).
+And in fact, that is the right solution. Which I would have known right
+away if I hadn't entered "number of rounds for part 2" as 1000 instead of 10000...
+
+### Optimization.
+
+I don't think there is much to optimize here. The modulo and divide operations
+are simply very expensive on  a modern computer. Runtime is:
+
+```
+part1: 56120
+part2: 24389045529
+took 7.251863ms
+```
+
+Even simple things like this already help:
+
+```
+-   item /= relief;
+-   item %= modulo;
++   if relief != 1 {
++       item /= relief;
++   }
++   if item > modulo {
++       item %= modulo;
++   }
+```
+
+See:
+
+```
+part1: 56120
+part2: 24389045529
+took 5.210714ms
+```
+
+Making `relief` a constant and getting rid of `if relief != `:
+
+```
+part1: 56120
+part2: 24389045529
+took 5.069096ms
+```
+
+Not very convincing.
+
