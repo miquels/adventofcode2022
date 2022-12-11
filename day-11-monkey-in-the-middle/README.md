@@ -86,3 +86,13 @@ part2: 24389045529
 took 4.871825ms
 ```
 
+Then, we can keep the worry levels of the items in a u32 instead of u64,
+that might help a bit:
+
+```
+part1: 56120
+part2: 24389045529
+took 4.400663ms
+```
+
+Well, from 7.2 ms to 4.4ms is not too bad!
