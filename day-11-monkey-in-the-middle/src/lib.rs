@@ -19,23 +19,16 @@ pub fn part1_2(input: &str) {
 
 #[derive(Default, Debug, Clone)]
 enum Op {
+    Add(u64),
+    Mul(u64),
     #[default]
-    Add,
-    Mul,
-}
-
-#[derive(Default, Debug, Clone)]
-enum Val {
-    #[default]
-    Old,
-    Num(u64),
+    Sq,
 }
 
 #[derive(Default, Debug, Clone)]
 struct Monkey {
     items: VecDeque<u64>,
     op: Op,
-    val: Val,
     test_div: u64,
     next_true: usize,
     next_false: usize,
@@ -46,19 +39,16 @@ fn round<const RELIEF: u64>(monkeys: &mut [Monkey], modulo: u64) {
     for i in 0 .. monkeys.len() {
         while let Some(mut item) = monkeys[i].items.pop_front() {
             let m = &mut monkeys[i];
-            let val = match m.val {
-                Val::Old => item,
-                Val::Num(num) => num,
-            };
             item = match m.op {
-                Op::Add => item + val,
-                Op::Mul => item * val,
+                Op::Sq => item * item,
+                Op::Add(val) => item + val,
+                Op::Mul(val) => item * val,
             };
+            if item > modulo {
+                item = item % modulo;
+            }
             m.inspected += 1;
             item /= RELIEF;
-            if item > modulo {
-                item %= modulo;
-            }
             let next = if item % m.test_div == 0 { m.next_true } else { m.next_false };
             monkeys[next].items.push_back(item);
         }
@@ -80,8 +70,12 @@ fn parse(input: &str) -> Vec<Monkey> {
                 m.items = line[18..].split(", ").map(|n| n.parse::<u64>().unwrap()).collect();
             },
             2 => {
-                m.op = if &line[23..24] == "+" { Op::Add } else { Op::Mul };
-                m.val = line[25..].parse::<u64>().map(Val::Num).unwrap_or(Val::Old);
+                m.op = if &line[23..] == "* old" {
+                    Op::Sq
+                } else {
+                    let val = line[25..].parse::<u64>().unwrap();
+                    if &line[23..24] == "+" { Op::Add(val) } else { Op::Mul(val) }
+                };
             },
             3 => m.test_div = line[21..].parse().unwrap(),
             4 => m.next_true = line[29..].parse().unwrap(),

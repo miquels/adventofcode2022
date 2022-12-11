@@ -77,3 +77,12 @@ took 5.069096ms
 
 Not very convincing.
 
+It occurred to me that I can merge `Val` and `Op` into one `Op` enum. This shaves
+off another 0.2ms or so...
+
+```
+part1: 56120
+part2: 24389045529
+took 4.871825ms
+```
+
