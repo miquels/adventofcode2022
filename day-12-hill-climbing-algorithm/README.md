@@ -7,7 +7,7 @@ with certain weights.
 - each block has a height 1..26
 - adjacent squares up/down/left/right are connected if their height
   is lower _or_ max. one bigger than our heigtht
-- the distance to an adjacent square is (`our_reight + 2 - their_height`)
+- the distance to an adjacent square is always 1.
 
 ### Part 1.
 
