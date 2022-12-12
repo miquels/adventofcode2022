@@ -15,3 +15,5 @@ Find the shortest path from the source to the destination. Dijkstra!
 
 ### Part 2.
 
+Find the shortest path from end `E` to any square of height `a`. We just run
+dijkstra starting at `E`, then select the shortest path to any `a`.

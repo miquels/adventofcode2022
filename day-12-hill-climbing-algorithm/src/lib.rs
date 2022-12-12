@@ -1,43 +1,25 @@
+use itertools::iproduct;
 
 pub fn part1(input: &str) {
     let map = HeightMap::parse(input);
-    let res = map.dijkstra();
-    println!("part1: {}", res);
+
+    let steps = map.dijkstra(map.start, true);
+    println!("part1: {}", steps[map.end.y][map.end.x]);
+
+    let steps = map.dijkstra(map.end, false);
+    let s = iproduct!(0 ..= map.max_y, 0 ..= map.max_x)
+        .filter_map(|(y, x)| {
+            (map.grid[y][x] == 0).then(|| steps[y][x])
+        })
+        .min()
+        .unwrap();
+    println!("part2: {}", s);
 }
 
-#[derive(Clone, Copy, Default, Debug, Eq, Ord, PartialEq, PartialOrd)]
-struct Pos {
-    x: usize,
-    y: usize,
-}
-
-struct PositionSteps {
-    steps: u32,
-    pos: Pos,
-}
-
-impl Ord for PositionSteps {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        other.steps.cmp(&self.steps)
-    }
-}
-
-impl PartialOrd for PositionSteps {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl PartialEq for PositionSteps {
-    fn eq(&self, other: &Self) -> bool {
-        self.steps.eq(&other.steps)
-    }
-}
-
-impl Eq for PositionSteps {}
+type Grid = Vec<Vec<u16>>;
 
 struct HeightMap {
-    grid: Vec<Vec<u16>>,
+    grid: Grid,
     max_x: usize,
     max_y: usize,
     start: Pos,
@@ -46,52 +28,65 @@ struct HeightMap {
 
 impl HeightMap {
     #[inline]
-    fn neighbors(&self, p: Pos) -> impl Iterator<Item = (Pos, u16)> + '_ {
-        let maxh = self.grid[p.y][p.x] + 1;
+    fn neighbors(&self, p: Pos, up: bool) -> impl Iterator<Item = (Pos, u16)> + '_ {
+        let h = self.grid[p.y][p.x];
         let Pos { x, y } = p;
         [
-            (y > 0 && self.grid[y-1][x] <= maxh).then(|| (x, y - 1)),
-            (x > 0 && self.grid[y][x-1] <= maxh).then(|| (x - 1, y)),
-            (x < self.max_x && self.grid[y][x+1] <= maxh).then(|| (x + 1, y)),
-            (y < self.max_y && self.grid[y+1][x] <= maxh).then(|| (x, y + 1)),
+            (y > 0).then(|| (x, y - 1)),
+            (x > 0).then(|| (x - 1, y)),
+            (x < self.max_x).then(|| (x + 1, y)),
+            (y < self.max_y).then(|| (x, y + 1)),
         ]
         .into_iter()
         .flatten()
-        .map(move |(x, y)| (Pos { x, y }, 1))
+        .filter(move |(x, y)| if up {
+                self.grid[*y][*x] <= h + 1
+            } else {
+                h <= self.grid[*y][*x]+ 1
+            }
+        )
+        .map(|(x, y)| (Pos { x, y }, 1))
     }
 
-    fn dijkstra(&self) -> u16 {
+    fn dijkstra(&self, start: Pos, up: bool) -> Grid {
         let mut nodes = (0..=self.max_y)
             .map(|_| {
                 let mut row = Vec::new();
-                row.resize(self.max_x + 1, i32::MAX as u32);
+                row.resize(self.max_x + 1, u16::MAX);
                 row
             })
             .collect::<Vec<_>>();
-        nodes[self.start.y][self.start.x] = 0;
+        nodes[start.y][start.x] = 0;
+
+        let mut visited = (0..=self.max_y)
+            .map(|_| {
+                let mut row = Vec::new();
+                row.resize(self.max_x + 1, false);
+                row
+            })
+            .collect::<Vec<_>>();
 
         let mut to_visit = std::collections::BinaryHeap::new();
         to_visit.push(PositionSteps {
-            pos: self.start,
+            pos: start,
             steps: 0,
         });
 
         while let Some(PositionSteps { pos, steps }) = to_visit.pop() {
-            if (nodes[pos.y][pos.x] & 0x80000000) > 0 {
+            if visited[pos.y][pos.x] {
                 continue;
             }
-            nodes[pos.y][pos.x] |= 0x80000000;
+            visited[pos.y][pos.x] = true;
 
-            for (npos, nsteps) in self.neighbors(pos) {
-                let n = steps + nsteps as u32;
-                if n < (nodes[npos.y][npos.x] & 0x7fffffff) {
-                    nodes[npos.y][npos.x] &= 0x80000000;
-                    nodes[npos.y][npos.x] |= n;
+            for (npos, nsteps) in self.neighbors(pos, up) {
+                let n = steps + nsteps;
+                if n < nodes[npos.y][npos.x] {
+                    nodes[npos.y][npos.x] = n;
                     to_visit.push(PositionSteps { pos: npos, steps: n });
                 }
             }
         }
-        (nodes[self.end.y][self.end.x] & 0x7fffffff) as u16
+        nodes
     }
 
     fn parse(input: &str) -> HeightMap {
@@ -124,3 +119,35 @@ impl HeightMap {
         }
     }
 }
+
+#[derive(Clone, Copy, Default, Debug, Eq, Ord, PartialEq, PartialOrd)]
+struct Pos {
+    x: usize,
+    y: usize,
+}
+
+struct PositionSteps {
+    steps: u16,
+    pos: Pos,
+}
+
+impl Ord for PositionSteps {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        other.steps.cmp(&self.steps)
+    }
+}
+
+impl PartialOrd for PositionSteps {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl PartialEq for PositionSteps {
+    fn eq(&self, other: &Self) -> bool {
+        self.steps.eq(&other.steps)
+    }
+}
+
+impl Eq for PositionSteps {}
+

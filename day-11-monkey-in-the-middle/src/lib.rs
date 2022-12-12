@@ -1,10 +1,11 @@
 use std::collections::VecDeque;
+use num::integer::lcm;
 
 pub fn part1_2(input: &str) {
     let mut monkeys = parse(input);
     let mut clones = monkeys.clone();
 
-    let modulo = monkeys.iter().map(|m| m.test_div).product::<u32>() as u64;
+    let modulo = monkeys.iter().map(|m| m.test_div).fold(1u64, |acc, x| lcm(acc, x));
 
     for _ in 0 .. 20 {
         round::<3>(&mut monkeys, modulo);
@@ -19,20 +20,21 @@ pub fn part1_2(input: &str) {
 
 #[derive(Default, Debug, Clone)]
 enum Op {
-    Add(u32),
-    Mul(u32),
+    Add(u64),
+    Mul(u64),
     #[default]
     Sq,
+    Double,
 }
 
 #[derive(Default, Debug, Clone)]
 struct Monkey {
-    items: VecDeque<u32>,
+    items: VecDeque<u64>,
     op: Op,
-    test_div: u32,
+    test_div: u64,
     next_true: usize,
     next_false: usize,
-    inspected: u32,
+    inspected: u64,
 }
 
 fn round<const RELIEF: u64>(monkeys: &mut [Monkey], modulo: u64) {
@@ -41,13 +43,15 @@ fn round<const RELIEF: u64>(monkeys: &mut [Monkey], modulo: u64) {
             let m = &mut monkeys[i];
             let mut item = match m.op {
                 Op::Sq => item as u64 * item as u64,
+                Op::Double => item as u64 * 2,
                 Op::Add(val) => (item + val) as u64,
                 Op::Mul(val) => (item * val) as u64,
             };
+            item = (item / RELIEF) as u64;
             if item > modulo {
                 item %= modulo;
             }
-            let item = (item / RELIEF) as u32;
+            let item = (item / RELIEF) as u64;
             m.inspected += 1;
             let next = if item % m.test_div == 0 { m.next_true } else { m.next_false };
             monkeys[next].items.push_back(item);
@@ -64,16 +68,19 @@ fn parse(input: &str) -> Vec<Monkey> {
     let mut monkeys = Vec::new();
     let mut m = Monkey::default();
     for (idx, line) in input.lines().enumerate() {
+        // println!("{idx} {line}");
         match idx % 7 {
             0 => {},
             1 => {
-                m.items = line[18..].split(", ").map(|n| n.parse::<u32>().unwrap()).collect();
+                m.items = line[18..].split(", ").map(|n| n.parse::<u64>().unwrap()).collect();
             },
             2 => {
                 m.op = if &line[23..] == "* old" {
                     Op::Sq
+                } else if &line[23..] == "+ old" {
+                    Op::Double
                 } else {
-                    let val = line[25..].parse::<u32>().unwrap();
+                    let val = line[25..].parse::<u64>().unwrap();
                     if &line[23..24] == "+" { Op::Add(val) } else { Op::Mul(val) }
                 };
             },
