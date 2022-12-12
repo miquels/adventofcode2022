@@ -51,7 +51,6 @@ fn round<const RELIEF: u64>(monkeys: &mut [Monkey], modulo: u64) {
             if item > modulo {
                 item %= modulo;
             }
-            let item = (item / RELIEF) as u64;
             m.inspected += 1;
             let next = if item % m.test_div == 0 { m.next_true } else { m.next_false };
             monkeys[next].items.push_back(item);

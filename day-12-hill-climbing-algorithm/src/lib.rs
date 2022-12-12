@@ -16,7 +16,7 @@ pub fn part1(input: &str) {
     println!("part2: {}", s);
 }
 
-type Grid = Vec<Vec<u16>>;
+type Grid = Vec<Vec<u32>>;
 
 struct HeightMap {
     grid: Grid,
@@ -28,7 +28,7 @@ struct HeightMap {
 
 impl HeightMap {
     #[inline]
-    fn neighbors(&self, p: Pos, up: bool) -> impl Iterator<Item = (Pos, u16)> + '_ {
+    fn neighbors(&self, p: Pos, up: bool) -> impl Iterator<Item = (Pos, u32)> + '_ {
         let h = self.grid[p.y][p.x];
         let Pos { x, y } = p;
         [
@@ -52,7 +52,7 @@ impl HeightMap {
         let mut nodes = (0..=self.max_y)
             .map(|_| {
                 let mut row = Vec::new();
-                row.resize(self.max_x + 1, u16::MAX);
+                row.resize(self.max_x + 1, u32::MAX);
                 row
             })
             .collect::<Vec<_>>();
@@ -106,7 +106,7 @@ impl HeightMap {
                         end = Pos { x, y };
                         25
                     } else {
-                        (b - b'a') as u16
+                        (b - b'a') as u32
                     })
                 .collect::<Vec<_>>())
             .collect::<Vec<_>>();
@@ -127,7 +127,7 @@ struct Pos {
 }
 
 struct PositionSteps {
-    steps: u16,
+    steps: u32,
     pos: Pos,
 }
 
