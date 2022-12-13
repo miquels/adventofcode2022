@@ -8,6 +8,7 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.0.29", features = ["derive"] }
+runner = { path = "runner", version = "0.1.0" }
 day-01 = { path = "day-01-calorie-counting", version = "0.1.0" }
 day-02 = { path = "day-02-rock-paper-scissors", version = "0.1.0" }
 day-03 = { path = "day-03-rucksack-reorganization", version = "0.1.0" }

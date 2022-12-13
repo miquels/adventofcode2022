@@ -1,32 +1,30 @@
 use std::cmp::Ordering;
-use std::time::Instant;
+use runner::*;
 
-pub fn part1_2(input: &str) {
-    let now = Instant::now();
-    let packets = input
+pub fn start(ctx: &mut Ctx) {
+    let packets = ctx
+        .input()
         .trim()
         .split('\n')
         .filter(|l| l.len() != 0)
         .map(|l| Packet::parse(l))
         .collect::<Vec<_>>();
-    println!("parsing: {:?}", now.elapsed());
+    ctx.update_timer(Timer::Parsing);
 
-    let now = Instant::now();
     let p1 = packets
         .chunks(2)
         .enumerate()
         .filter_map(|(idx, pair)| (pair[0] <= pair[1]).then(|| idx + 1))
         .sum::<usize>();
-    println!("part1: {}", p1);
-    println!("part1: {:?}", now.elapsed());
+    outputln!(ctx, "part1: {}", p1);
+    ctx.update_timer(Timer::Part1);
 
-    let now = Instant::now();
     let two = Packet::parse("[[2]]");
     let six = Packet::parse("[[6]]");
     let under_two = packets.iter().filter(|packet| *packet < &two).count();
     let under_six = packets.iter().filter(|packet| *packet < &six).count();
-    println!("part2: {}", (under_two + 1) * (under_six + 2));
-    println!("part2: {:?}", now.elapsed());
+    outputln!(ctx, "part2: {}", (under_two + 1) * (under_six + 2));
+    ctx.update_timer(Timer::Part2);
 }
 
 #[derive(Debug, Clone)]

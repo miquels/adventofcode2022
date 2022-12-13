@@ -1,8 +1,7 @@
 [package]
-name = "day-01"
+name = "runner"
 version = "0.1.0"
 authors = ["Miquel van Smoorenburg <mike@langeraar.net>"]
 edition = "2021"
 
 [dependencies]
-runner = { path = "../runner", version = "0.1" }

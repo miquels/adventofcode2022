@@ -1,9 +1,11 @@
-use std::fs::read_to_string;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 use clap::Parser;
+use runner::Runner;
 
-const DAYS: &'static [(u32, &str, u32, fn(&str), fn(&str))] = &[
-    ( 1, "day-01-calorie-counting", 2, day_01::part1, day_01::part2 ),
+const DAYS: &'static [(u32, &str, fn(&mut runner::Ctx))] = &[
+    ( 1, "day-01-calorie-counting", day_01::start ),
+    ( 13, "day-13-distress-signal", day_13::start ),
+    /*
     ( 2, "day-02-rock-paper-scissors", 2, day_02::part1a, day_02::part2a ),
     ( 3, "day-03-rucksack-reorganization", 2, day_03::part1, day_03::part2 ),
     ( 4, "day-04-camp-cleanup", 1, day_04::part1_2, day_04::part1_2 ),
@@ -15,8 +17,8 @@ const DAYS: &'static [(u32, &str, u32, fn(&str), fn(&str))] = &[
     ( 10, "day-10-cathode-ray-tube", 1, day_10::part1_2, day_10::part1_2 ),
     ( 11, "day-11-monkey-in-the-middle", 1, day_11::part1_2, day_11::part1_2 ),
     ( 12, "day-12-hill-climbing-algorithm", 1, day_12::part1, day_12::part1 ),
-    ( 13, "day-13-distress-signal", 1, day_13::part1_2, day_13::part1_2 ),
     ( 105, "day-05-supply-stacks", 1, day_05::part1_2_heavy_duty, day_05::part1_2 ),
+    */
 ];
 
 #[derive(Parser)]
@@ -31,6 +33,12 @@ struct Options {
     /// Input file to use
     #[arg(long, default_value_t = String::from("input.txt"))]
     input: String,
+    /// Benchmark.
+    #[arg(long)]
+    bench: bool,
+    /// Buffer output instead of printing to stdout right away
+    #[arg(long)]
+    buffered: bool,
 }
 
 fn day_parser(s: &str) -> Result<u32, String> {
@@ -56,29 +64,11 @@ fn main() {
     let opts = Options::parse();
     let mut tot_elapsed = Duration::from_secs(0);
 
-    for (day, dir, nparts, part1, part2) in DAYS {
+    for (day, dir, func) in DAYS {
         if (opts.day == 0 && *day < 100) || opts.day == *day {
-            eprintln!("{}: {}", &dir[..6], &dir[7..]);
-            let file = format!("{}/input/{}", dir, opts.input);
-            let input = read_to_string(&file).expect(&file);
-            for part in 1 ..= *nparts {
-                if opts.part.is_none() || opts.part == Some(part) || *nparts == 1 {
-                    if *nparts == 1 {
-                        eprintln!(" == start ==");
-                    } else {
-                        eprintln!("part{}: == start ==", part);
-                    }
-                    let start = Instant::now();
-                    if part == 1 { part1(&input) } else { part2(&input) }
-                    let elapsed = start.elapsed();
-                    if *nparts == 1 {
-                        eprintln!("took {:?}", elapsed);
-                    } else {
-                        eprintln!("part{}: took {:?}", part, elapsed);
-                    }
-                    tot_elapsed += elapsed;
-                }
-            }
+            let mut runner = Runner::new(dir, &opts.input, opts.bench, opts.buffered, func);
+            runner.run();
+            tot_elapsed += runner.elapsed();
         }
     }
 
