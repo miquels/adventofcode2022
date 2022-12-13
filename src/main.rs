@@ -15,7 +15,7 @@ const DAYS: &'static [(u32, &str, u32, fn(&str), fn(&str))] = &[
     ( 10, "day-10-cathode-ray-tube", 1, day_10::part1_2, day_10::part1_2 ),
     ( 11, "day-11-monkey-in-the-middle", 1, day_11::part1_2, day_11::part1_2 ),
     ( 12, "day-12-hill-climbing-algorithm", 1, day_12::part1, day_12::part1 ),
-    ( 13, "day-13-distress-signal", 1, day_13::part1, day_13::part1 ),
+    ( 13, "day-13-distress-signal", 1, day_13::part1_2, day_13::part1_2 ),
     ( 105, "day-05-supply-stacks", 1, day_05::part1_2_heavy_duty, day_05::part1_2 ),
 ];
 
