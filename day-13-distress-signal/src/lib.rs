@@ -3,7 +3,7 @@ use std::time::Instant;
 
 pub fn part1_2(input: &str) {
     let now = Instant::now();
-    let mut packets = input
+    let packets = input
         .trim()
         .split('\n')
         .filter(|l| l.len() != 0)
@@ -23,15 +23,9 @@ pub fn part1_2(input: &str) {
     let now = Instant::now();
     let two = Packet::parse("[[2]]");
     let six = Packet::parse("[[6]]");
-    packets.push(two.clone());
-    packets.push(six.clone());
-    packets.sort_unstable();
-    let p2 = packets
-        .iter()
-        .enumerate()
-        .filter_map(|(idx, packet)| (*packet == two || *packet == six).then(|| idx + 1))
-        .product::<usize>();
-    println!("part2: {}", p2);
+    let under_two = packets.iter().filter(|packet| *packet < &two).count();
+    let under_six = packets.iter().filter(|packet| *packet < &six).count();
+    println!("part2: {}", (under_two + 1) * (under_six + 2));
     println!("part2: {:?}", now.elapsed());
 }
 

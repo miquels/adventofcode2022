@@ -57,5 +57,17 @@ Let's see if we can make it faster:
   - even if we change the entire input to one big json array and parse it all at once:
     - 3.0ms !
 
-Okay, we're not going to get this any faster.
+There's still one way to shave off a few µs: we do not need to sort
+the array of packets to find the position of the divider packets. The
+position of the divider packets is the number of packets that are smaller
+than the divider packet. After this change:
+
+```
+parsing: 634.503µs
+part1: 6072
+part1: 11.216µs
+part2: 22184
+part2: 20.633µs
+took 1.055063ms
+```
 
