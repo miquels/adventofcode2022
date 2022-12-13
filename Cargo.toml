@@ -20,3 +20,4 @@ day-09 = { path = "day-09-rope-bridge", version = "0.1.0" }
 day-10 = { path = "day-10-cathode-ray-tube", version = "0.1.0" }
 day-11 = { path = "day-11-monkey-in-the-middle", version = "0.1.0" }
 day-12 = { path = "day-12-hill-climbing-algorithm", version = "0.1.0" }
+day-13 = { path = "day-13-distress-signal", version = "0.1.0" }
