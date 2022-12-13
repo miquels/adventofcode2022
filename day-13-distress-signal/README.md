@@ -43,4 +43,19 @@ part2: 112.968µs
 took 1.180971ms
 ```
 
-It's probably all the index operations in the parser.
+Let's see if we can make it faster:
+
+- it's probably all the index operations in the parser.
+  - replace indexing with an `Iterator` over `u8` bytes.
+  - same speed.
+
+- use `serde_json` to deserialize
+  - 3.2ms !
+
+- use `simd_json` to deserialize
+  - 3.2ms ! (line-by-line)
+  - even if we change the entire input to one big json array and parse it all at once:
+    - 3.0ms !
+
+Okay, we're not going to get this any faster.
+
