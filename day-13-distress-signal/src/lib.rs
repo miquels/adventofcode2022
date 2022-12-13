@@ -51,23 +51,23 @@ impl Packet {
         let mut idx = 0;
         let mut list = Vec::new();
         loop {
-            if line[idx] == b'[' {
-                let (nidx, nlist) = Packet::parse2(&line[idx + 1..]);
-                idx += nidx + 2;
-                list.push(nlist);
-            } else if line[idx] == b']' {
-                break;
-            } else if line[idx] == b',' {
-                idx += 1;
-            } else if line[idx] >= b'0' && line[idx] <= b'9' {
-                let mut n = 0u32;
-                while line[idx] >= b'0' && line[idx] <= b'9' {
-                    n = n * 10 + (line[idx] - b'0') as u32;
-                    idx += 1;
-                }
-                list.push(Packet::List(vec![ Packet::Number(n) ]));
-            } else {
-                panic!("unexpected: <{}>", line[idx] as char);
+            match line[idx] {
+                b'[' => {
+                    let (nidx, nlist) = Packet::parse2(&line[idx + 1..]);
+                    idx += nidx + 2;
+                    list.push(nlist);
+                },
+                b']' => break,
+                b',' => idx += 1,
+                b if b >= b'0' && b <= b'9' => {
+                    let mut n = 0u32;
+                    while line[idx] >= b'0' && line[idx] <= b'9' {
+                        n = n * 10 + (line[idx] - b'0') as u32;
+                        idx += 1;
+                    }
+                    list.push(Packet::List(vec![ Packet::Number(n) ]));
+                },
+                x => panic!("unexpected: <{}>", x),
             }
         }
         (idx, Packet::List(list))
