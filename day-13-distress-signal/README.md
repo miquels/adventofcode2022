@@ -71,3 +71,23 @@ part2: 20.633µs
 took 1.055063ms
 ```
 
+And then finally you see that you're doing an extraneous Vec allocation
+for every number ... **argh**. Let fix that:
+
+```
+-                    list.push(Packet::List(vec![ Packet::Number(n) ]));
++                    list.push(Packet::Number(n));
+```
+
+And now:
+
+```
+parsing: 438.051µs
+part1: 6072
+part1: 9.481µs
+part2: 22184
+part2: 18.464µs
+took 683.219µs
+```
+
+MUCH better!

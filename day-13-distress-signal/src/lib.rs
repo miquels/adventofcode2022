@@ -59,7 +59,7 @@ impl Packet {
                         n = n * 10 + (line[idx] - b'0') as u32;
                         idx += 1;
                     }
-                    list.push(Packet::List(vec![ Packet::Number(n) ]));
+                    list.push(Packet::Number(n));
                 },
                 x => panic!("unexpected: <{}>", x),
             }
