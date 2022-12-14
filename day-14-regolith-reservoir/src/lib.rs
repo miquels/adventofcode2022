@@ -3,88 +3,75 @@ use itertools::Itertools;
 use runner::*;
 
 pub fn start(ctx: &mut Ctx) {
-    let mut cave = Cave::parse(ctx.input());
-    ctx.update_timer(Ctx::PARSING);
+    let mut cave = Cave::parse(ctx);
+    cave.ctx.update_timer(Ctx::PARSING);
 
-    let mut units = 0u32;
-    while cave.drop_sand() {
-        units += 1;
-    }
-    outputln!(ctx, "part1: units: {}", units);
-    ctx.update_timer(Ctx::PART1);
-
-    cave.init_part2();
-    let mut units = 0u32;
-    while cave.drop_sand() {
-        units += 1;
-    }
-    outputln!(ctx, "part2: units: {}", units);
-    ctx.update_timer(Ctx::PART2);
+    cave.drop_sand(500, 0);
+    outputln!(cave.ctx, "part2: units: {}", cave.units);
+    cave.ctx.update_timer(Ctx::PART2);
 }
 
-#[derive(Default)]
-struct Cave {
+struct Cave<'a, 'b> {
     grid: Vec<Vec<u8>>,
     max_y: usize,
     part: usize,
+    units: u32,
+    ctx: &'a mut Ctx<'b>,
 }
 
-impl Cave {
-    // Sand units enter at 500,0.
-    // Run the simulation for one unit until the unit comes to rest or exits.
-    fn drop_sand(&mut self) -> bool {
-        let (mut x, mut y) = (500, 0);
-        loop {
-            if self.part == 1 && y == self.max_y {
-                return false;
-            }
-            if self.elem_at(x, y + 1) == b'.' {
-                y += 1;
-                continue;
-            }
-            if x > 0 && self.elem_at(x-1, y+1) == b'.' {
-                y += 1;
-                x -= 1;
-                continue;
-            }
-            if self.elem_at(x+1, y+1) == b'.' {
-                y += 1;
-                x += 1;
-                continue;
-            }
-            if y == 0 && self.elem_at(x, y) != b'.' {
-                if self.part == 1 {
-                    panic!("cave full, cannot drop more units of sand");
-                } else {
-                    return false;
-                }
-            }
-            self.elem_set(x, y, b'o');
-            break;
+impl<'a, 'b> Cave<'a, 'b> where 'b: 'a {
+    // Run recursively.
+    fn drop_sand(&mut self, x: usize, y: usize) {
+        if self.elem_get(x, y) != b'.' {
+            return;
         }
-        true
+
+        if self.part == 1 && y == self.max_y + 1 {
+            outputln!(self.ctx, "part1: units: {}", self.units);
+            self.ctx.update_timer(Ctx::PART1);
+            self.max_y += 2;
+            self.part = 2;
+        }
+
+        self.drop_sand(x, y + 1);
+        if x > 0 {
+            self.drop_sand(x - 1, y + 1);
+        }
+        self.drop_sand(x + 1, y + 1);
+
+        self.elem_set(x, y, b'o');
+        self.units += 1;
     }
 
-    fn elem_at(&mut self, x: usize, y: usize) -> u8 {
+    fn elem_get(&mut self, x: usize, y: usize) -> u8 {
         if self.part == 2 && y == self.max_y {
             return b'#';
         }
-        if x >= self.grid[y].len() {
+        if y >= self.grid.len() || x >= self.grid[y].len() {
             return b'.';
         }
         self.grid[y][x]
     }
 
     fn elem_set(&mut self, x: usize, y: usize, val: u8) {
+        if self.grid.len() <= y {
+            self.grid.resize(y + 1, Vec::new());
+        }
         if self.grid[y].len() <= x {
             self.grid[y].resize(x + 1, b'.');
         }
         self.grid[y][x] = val;
     }
 
-    fn parse(input: &str) -> Cave {
-        let mut cave = Cave::default();
-        cave.part = 1;
+    fn parse(ctx: &'a mut Ctx<'b>) -> Cave<'a, 'b> {
+        let input = ctx.input();
+        let mut cave = Cave {
+            grid: Vec::new(),
+            max_y: 0,
+            part: 1,
+            units: 0,
+            ctx,
+        };
         input
             .trim()
             .split('\n')
@@ -99,6 +86,7 @@ impl Cave {
                     .tuple_windows::<(_, _)>()
                     .for_each(|(from, to)| cave.draw(from, to));
             });
+        cave.max_y = cave.grid.len() - 1;
         cave
     }
 
@@ -106,29 +94,10 @@ impl Cave {
         if from.0 > to.0 || from.1 > to.1 {
             mem::swap(&mut from, &mut to);
         }
-        if to.1 > self.max_y {
-            self.max_y = to.1;
-        }
-        if self.grid.len() <= to.1 {
-            self.grid.resize(to.1 + 1, Vec::new());
-        }
         for y in from.1 ..= to.1 {
-            if self.grid[y].len() <= to.0 {
-                self.grid[y].resize(to.0 + 1, b'.');
+            for x in from.0 ..= to.0 {
+                self.elem_set(x, y, b'#');
             }
-            self.grid[y][from.0 ..= to.0].fill(b'#');
         }
-    }
-
-    fn init_part2(&mut self) {
-        self
-            .grid
-            .iter_mut()
-            .for_each(|y| {
-                y.iter_mut().for_each(|x| if *x == b'o' { *x = b'.' });
-            });
-        self.grid.push(Vec::new());
-        self.max_y += 2;
-        self.part = 2;
     }
 }

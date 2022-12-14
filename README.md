@@ -16,3 +16,7 @@ Options:
   -h, --help           Print help information
   -V, --version        Print version information
 ```
+
+- tip from Cor: use floodfill, so instead of starting every time from the top
+  and crossing empty space, we start at the bottom and go up:
+

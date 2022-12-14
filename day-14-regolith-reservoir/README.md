@@ -34,3 +34,19 @@ day-14: part2: 5.820004ms
 day-14: finishing: 8.279µs
 day-14: total: 6.114436ms
 ```
+
+- tip from Cor: use floodfill, so instead of starting every time from the top
+  and crossing empty space, we run down to the bottom and then go up,
+  using recursion:
+
+```
+day-14: parsing: 108.796µs
+day-14: part1: units: 838
+day-14: part1: 17.928µs
+day-14: part2: units: 27539
+day-14: part2: 467.169µs
+day-14: finishing: 6.131µs
+day-14: total: 600.686µs
+```
+
+w00h00 :)
