@@ -85,6 +85,10 @@ impl Cave {
         self.grid[y][x]
     }
 
+    fn elem_set(&mut self, x: usize, y: usize, val: u8) {
+        self.grid[y][x] = val;
+    }
+
     // Sand units enter at 500,0.
     // Run the simulation for one unit until the unit comes to rest or exits.
     fn drop_sand(&mut self) -> bool {
@@ -107,14 +111,14 @@ impl Cave {
                 x += 1;
                 continue;
             }
-            if y == 0 && self.grid[y][x] != b'.' {
+            if y == 0 && self.elem_at(x, y) != b'.' {
                 if self.part == 1 {
                     panic!("cave full, cannot drop more units of sand");
                 } else {
                     return false;
                 }
             }
-            self.grid[y][x] = b'o';
+            self.elem_set(x, y, b'o');
             break;
         }
         true
