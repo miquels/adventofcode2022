@@ -29,6 +29,7 @@ dependencies = [
  "day-11",
  "day-12",
  "day-13",
+ "day-14",
  "jemallocator",
  "runner",
 ]
@@ -153,6 +154,13 @@ dependencies = [
 
 [[package]]
 name = "day-13"
+version = "0.1.0"
+dependencies = [
+ "runner",
+]
+
+[[package]]
+name = "day-14"
 version = "0.1.0"
 dependencies = [
  "runner",

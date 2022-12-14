@@ -8,6 +8,7 @@ static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
 const DAYS: &'static [(u32, &str, fn(&mut runner::Ctx))] = &[
     ( 1, "day-01-calorie-counting", day_01::start ),
     ( 13, "day-13-distress-signal", day_13::start ),
+    ( 14, "day-14-regolith-reservoir", day_14::start ),
     /*
     ( 2, "day-02-rock-paper-scissors", 2, day_02::part1a, day_02::part2a ),
     ( 3, "day-03-rucksack-reorganization", 2, day_03::part1, day_03::part2 ),
