@@ -1,11 +1,15 @@
-pub fn part1(input: &str) {
-    let mut trees = Trees::<99>::new(input);
-    println!("part1: {}", trees.count_visible());
-}
+use runner::*;
 
-pub fn part2(input: &str) {
-    let trees = Trees::<99>::new(input);
-    println!("part2: {}", trees.count_scenery());
+pub fn start(ctx: &mut Ctx) {
+    let input = ctx.input();
+    let mut trees = Trees::<99>::new(input);
+    ctx.update_timer(Ctx::PARSING);
+
+    outputln!(ctx, "part1: {}", trees.count_visible());
+    ctx.update_timer(Ctx::PART1);
+
+    outputln!(ctx, "part2: {}", trees.count_scenery());
+    ctx.update_timer(Ctx::PART2);
 }
 
 struct Trees<'i, const DIM: usize> {

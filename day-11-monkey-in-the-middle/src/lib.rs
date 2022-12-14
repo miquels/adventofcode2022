@@ -1,21 +1,26 @@
 use std::collections::VecDeque;
 use num::integer::lcm;
+use runner::*;
 
-pub fn part1_2(input: &str) {
+pub fn start(ctx: &mut Ctx) {
+    let input = ctx.input();
+
     let mut monkeys = parse(input);
     let mut clones = monkeys.clone();
-
     let modulo = monkeys.iter().map(|m| m.test_div).fold(1u64, |acc, x| lcm(acc, x));
+    ctx.update_timer(Ctx::PARSING);
 
     for _ in 0 .. 20 {
         round::<3>(&mut monkeys, modulo);
     }
-    println!("part1: {}", monkey_business(&mut monkeys));
+    outputln!(ctx, "part1: {}", monkey_business(&mut monkeys));
+    ctx.update_timer(Ctx::PART1);
 
     for _ in 0 .. 10000 {
         round::<1>(&mut clones, modulo);
     }
-    println!("part2: {}", monkey_business(&mut clones));
+    outputln!(ctx, "part2: {}", monkey_business(&mut clones));
+    ctx.update_timer(Ctx::PART2);
 }
 
 #[derive(Default, Debug, Clone)]

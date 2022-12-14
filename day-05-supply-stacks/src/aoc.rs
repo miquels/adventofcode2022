@@ -1,15 +1,21 @@
+use runner::*;
 
-pub fn part1_2(input: &str) {
+pub fn start(ctx: &mut Ctx) {
+    let input = ctx.input();
+
     let mut lines = input.trim_end().split("\n");
     let mut stacks = Stacks::parse_stacks(&mut lines);
     let cmds = Cmd::parse_cmds(&mut lines);
+    ctx.update_timer(Ctx::PARSING);
 
     let mut sclone = stacks.clone();
     sclone.cratemover_9000(&cmds);
-    println!("day-05: part1: {}", sclone.top_crates());
+    outputln!(ctx, "part1: {}", sclone.top_crates());
+    ctx.update_timer(Ctx::PART1);
 
     stacks.cratemover_9001(&cmds);
-    println!("day-05: part2: {}", stacks.top_crates());
+    outputln!(ctx, "part2: {}", stacks.top_crates());
+    ctx.update_timer(Ctx::PART2);
 }
 
 struct Cmd {

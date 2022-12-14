@@ -6,3 +6,4 @@ edition = "2021"
 
 [dependencies]
 scan_fmt = "0.2.6"
+runner = { path = "../runner", version = "0.1" }

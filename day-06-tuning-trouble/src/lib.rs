@@ -1,9 +1,13 @@
-pub fn part1(input: &str) {
-    println!("part1: {}", find_marker(input, 4) + 4);
-}
+use runner::*;
 
-pub fn part2(input: &str) {
-    println!("part2: {}", find_marker(input, 14) + 14);
+pub fn start(ctx: &mut Ctx) {
+    let input = ctx.input();
+
+    outputln!(ctx, "part1: {}", find_marker(input, 4) + 4);
+    ctx.update_timer(Ctx::PART1);
+
+    outputln!(ctx, "part2: {}", find_marker(input, 14) + 14);
+    ctx.update_timer(Ctx::PART2);
 }
 
 pub fn find_marker(input: &str, len: usize) -> usize {

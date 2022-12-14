@@ -1,21 +1,27 @@
-pub fn part1_2_notree(input: &str) {
-    let dirs = scan(input);
+use runner::*;
 
-    println!("part1: {}", dirs
+pub fn start_notree(ctx: &mut Ctx) {
+    let input = ctx.input();
+    let dirs = scan(input);
+    ctx.update_timer(Ctx::PARSING);
+
+    outputln!(ctx, "part1: {}", dirs
         .iter()
         .filter_map(|&n| (n < 100000).then(|| n))
         .sum::<u32>()
     );
+    ctx.update_timer(Ctx::PART1);
 
     let unused = 70000000 - dirs[0];
     let to_delete = 30000000 - unused;
 
-    println!("part2: {}", dirs
+    outputln!(ctx, "part2: {}", dirs
         .iter()
         .filter_map(|&n| (n > to_delete).then(|| n))
         .min()
         .unwrap()
     );
+    ctx.update_timer(Ctx::PART2);
 }
 
 enum Mode {

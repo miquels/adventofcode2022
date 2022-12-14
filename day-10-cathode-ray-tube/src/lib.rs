@@ -1,15 +1,23 @@
-pub fn part1_2(input: &str) {
+use runner::*;
+
+pub fn start(ctx: &mut Ctx) {
+    let input = ctx.input();
     let xv = run_program(input);
-    part1(&xv);
-    part2(&xv);
+    ctx.update_timer(Ctx::PARSING);
+
+    part1(ctx, &xv);
+    ctx.update_timer(Ctx::PART1);
+
+    part2(ctx, &xv);
+    ctx.update_timer(Ctx::PART2);
 }
 
-fn part1(xv: &[i32]) {
+fn part1(ctx: &mut Ctx, xv: &[i32]) {
     let p1 = (20..=220).step_by(40).map(|c| c * xv[c as usize]).sum::<i32>();
-    println!("part1: {}", p1);
+    outputln!(ctx, "part1: {}", p1);
 }
 
-fn part2(xv: &[i32]) {
+fn part2(ctx: &mut Ctx, xv: &[i32]) {
     let mut crt = String::new();
     for p in 0 .. 240 {
         let x = xv[(p + 1) as usize];
@@ -19,7 +27,7 @@ fn part2(xv: &[i32]) {
             crt.push_str("\n");
         }
     }
-    print!("{}", crt);
+    outputln!(ctx, "{}", crt);
 }
 
 fn run_program(input: &str) -> Vec<i32> {

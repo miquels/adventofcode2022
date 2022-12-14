@@ -1,22 +1,21 @@
-use std::time::Instant;
+use runner::*;
 
-pub fn part1_2_heavy_duty(input: &str) {
-    let now = Instant::now();
+pub fn start_heavy_duty(ctx: &mut Ctx) {
+    let input = ctx.input();
+
     let mut lines = input.trim_end().split("\n");
     let mut stacks = Stacks::parse_stacks(&mut lines);
     let cmds = Cmd::parse_cmds(&mut lines);
-    println!("day-105: read data: {:?}", now.elapsed());
+    ctx.update_timer(Ctx::PARSING);
 
-    let now = Instant::now();
     let mut sclone = stacks.clone();
     sclone.cratemover_9000(&cmds);
-    println!("day-105: part1: {}", sclone.top_crates());
-    println!("day-105: part1: {:?}", now.elapsed());
+    outputln!(ctx, "part1: {}", sclone.top_crates());
+    ctx.update_timer(Ctx::PART1);
 
-    let now = Instant::now();
     stacks.cratemover_9001(&cmds);
-    println!("day-105: part2: {}", stacks.top_crates());
-    println!("day-105: part2: {:?}", now.elapsed());
+    outputln!(ctx, "part2: {}", stacks.top_crates());
+    ctx.update_timer(Ctx::PART2);
 }
 
 struct Cmd {

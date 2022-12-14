@@ -6,3 +6,4 @@ edition = "2021"
 
 [dependencies]
 rustc-hash = "1.1.0"
+runner = { path = "../runner", version = "0.1" }

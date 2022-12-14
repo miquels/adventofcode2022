@@ -1,10 +1,15 @@
 use itertools::iproduct;
+use runner::*;
 
-pub fn part1(input: &str) {
+pub fn start(ctx: &mut Ctx) {
+    let input = ctx.input();
+
     let map = HeightMap::parse(input);
+    ctx.update_timer(Ctx::PARSING);
 
     let steps = map.dijkstra(map.start, true);
-    println!("part1: {}", steps[map.end.y][map.end.x]);
+    outputln!(ctx, "part1: {}", steps[map.end.y][map.end.x]);
+    ctx.update_timer(Ctx::PART1);
 
     let steps = map.dijkstra(map.end, false);
     let s = iproduct!(0 ..= map.max_y, 0 ..= map.max_x)
@@ -13,7 +18,8 @@ pub fn part1(input: &str) {
         })
         .min()
         .unwrap();
-    println!("part2: {}", s);
+    outputln!(ctx, "part2: {}", s);
+    ctx.update_timer(Ctx::PART2);
 }
 
 type Grid = Vec<Vec<u32>>;

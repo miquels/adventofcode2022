@@ -1,4 +1,8 @@
-pub fn part1_2(input: &str) {
+use runner::*;
+
+pub fn start(ctx: &mut Ctx) {
+    let input = ctx.input();
+
     let mut p1 = 0u32;
     let mut p2 = 0u32;
     for line in input.trim().as_bytes().split(|b| *b == b'\n') {
@@ -8,8 +12,9 @@ pub fn part1_2(input: &str) {
         p1 += ((l & r) == l || (l & r) == r) as u32;
         p2 += ((l & r) > 0) as u32;
     }
-    println!("part1: {}", p1);
-    println!("part2: {}", p2);
+    outputln!(ctx, "part1: {}", p1);
+    outputln!(ctx, "part2: {}", p2);
+    ctx.update_timer(Ctx::PART12);
 }
 
 fn parse_range(range: &[u8], idx: &mut usize) -> u128 {

@@ -1,3 +1,14 @@
+use runner::*;
+
+pub fn start(ctx: &mut Ctx) {
+    let input = ctx.input();
+
+    part1(ctx, input);
+    ctx.update_timer(Ctx::PART1);
+
+    part2(ctx, input);
+    ctx.update_timer(Ctx::PART2);
+}
 
 fn index(b: u8) -> usize {
     // a-z = 0-25, A-Z = 26-51.
@@ -6,7 +17,7 @@ fn index(b: u8) -> usize {
     r
 }
 
-pub fn part1(input: &str) {
+pub fn part1(ctx: &mut Ctx, input: &str) {
     let r = input
         .trim()
         .as_bytes()
@@ -21,10 +32,10 @@ pub fn part1(input: &str) {
             (0..52).find_map(|i| (table[i] == 3).then(|| i)).unwrap() + 1
         })
         .sum::<usize>();
-    println!("part1: {}", r);
+    outputln!(ctx, "part1: {}", r);
 }
 
-pub fn part2(input: &str) {
+pub fn part2(ctx: &mut Ctx, input: &str) {
     let mut table = [0u8; 52];
     let r = input
         .trim()
@@ -53,5 +64,5 @@ pub fn part2(input: &str) {
             }
         })
         .sum::<usize>();
-    println!("part2: {}", r);
+    outputln!(ctx, "part2: {}", r);
 }

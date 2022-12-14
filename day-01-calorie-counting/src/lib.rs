@@ -1,5 +1,4 @@
-use runner::Ctx;
-use std::fmt::Write;
+use runner::*;
 
 fn calorie_list(input: &str) -> Vec<u64> {
     let mut cals = input.split("\n\n")

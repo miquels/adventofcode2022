@@ -7,22 +7,20 @@ static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
 
 const DAYS: &'static [(u32, &str, fn(&mut runner::Ctx))] = &[
     ( 1, "day-01-calorie-counting", day_01::start ),
+    ( 2, "day-02-rock-paper-scissors", day_02::start ),
+    ( 3, "day-03-rucksack-reorganization", day_03::start ),
+    ( 4, "day-04-camp-cleanup", day_04::start ),
+    ( 5, "day-05-supply-stacks", day_05::start ),
+    ( 6, "day-06-tuning-trouble", day_06::start ),
+    ( 7, "day-07-no-space-left-on-device", day_07::start_notree ),
+    ( 8, "day-08-treetop-tree-house", day_08::start ),
+    ( 9, "day-09-rope-bridge", day_09::start ),
+    ( 10, "day-10-cathode-ray-tube", day_10::start ),
+    ( 11, "day-11-monkey-in-the-middle", day_11::start ),
+    ( 12, "day-12-hill-climbing-algorithm", day_12::start ),
     ( 13, "day-13-distress-signal", day_13::start ),
     ( 14, "day-14-regolith-reservoir", day_14::start ),
-    /*
-    ( 2, "day-02-rock-paper-scissors", 2, day_02::part1a, day_02::part2a ),
-    ( 3, "day-03-rucksack-reorganization", 2, day_03::part1, day_03::part2 ),
-    ( 4, "day-04-camp-cleanup", 1, day_04::part1_2, day_04::part1_2 ),
-    ( 5, "day-05-supply-stacks", 1, day_05::part1_2, day_05::part1_2 ),
-    ( 6, "day-06-tuning-trouble", 2, day_06::part1, day_06::part2 ),
-    ( 7, "day-07-no-space-left-on-device", 1, day_07::part1_2_notree, day_07::part1_2 ),
-    ( 8, "day-08-treetop-tree-house", 2, day_08::part1, day_08::part2 ),
-    ( 9, "day-09-rope-bridge", 1, day_09::part1_2, day_09::part1_2 ),
-    ( 10, "day-10-cathode-ray-tube", 1, day_10::part1_2, day_10::part1_2 ),
-    ( 11, "day-11-monkey-in-the-middle", 1, day_11::part1_2, day_11::part1_2 ),
-    ( 12, "day-12-hill-climbing-algorithm", 1, day_12::part1, day_12::part1 ),
-    ( 105, "day-05-supply-stacks", 1, day_05::part1_2_heavy_duty, day_05::part1_2 ),
-    */
+    ( 105, "day-05-supply-stacks", day_05::start_heavy_duty ),
 ];
 
 #[derive(Parser)]

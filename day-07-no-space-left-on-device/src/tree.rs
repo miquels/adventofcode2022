@@ -1,29 +1,28 @@
-use std::time::Instant;
+use runner::*;
 
-pub fn part1_2(input: &str) {
-    let now = Instant::now();
+pub fn start_tree(ctx: &mut Ctx) {
+    let input = ctx.input();
+
     let root = Directory::parse(input);
-    println!("parsing: {:?}", now.elapsed());
+    ctx.update_timer(Ctx::PARSING);
 
-    let now = Instant::now();
-    println!("part1: {}", root
+    outputln!(ctx, "part1: {}", root
         .iter()
         .filter_map(|n| (n.size() < 100000).then(|| n.size()))
         .sum::<u32>()
     );
-    println!("part1: {:?}", now.elapsed());
+    ctx.update_timer(Ctx::PART1);
 
     let unused = 70000000 - root.size();
     let to_delete = 30000000 - unused;
 
-    let now = Instant::now();
-    println!("part2: {}", root
+    outputln!(ctx, "part2: {}", root
         .iter()
         .filter_map(|n| (n.size() > to_delete).then(|| n.size()))
         .min()
         .unwrap()
     );
-    println!("part2: {:?}", now.elapsed());
+    ctx.update_timer(Ctx::PART2);
 }
 
 enum Mode {

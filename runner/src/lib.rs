@@ -39,6 +39,7 @@ pub enum Timer {
     Parsing = 0,
     Part1,
     Part2,
+    Part12,
     Finishing,
 }
 
@@ -48,6 +49,7 @@ impl fmt::Display for Timer {
             Timer::Parsing => "parsing",
             Timer::Part1 => "part1",
             Timer::Part2 => "part2",
+            Timer::Part12 => "part1+2",
             Timer::Finishing => "finishing",
         };
         write!(f, "{}", id)
@@ -149,7 +151,7 @@ pub struct Ctx<'a> {
     input:  Option<&'a str>,
     start:  Instant,
     start_part: Instant,
-    timers: [Duration; 4],
+    timers: [Duration; 5],
     bench: bool,
     name: &'a str,
     nlseen: bool,
@@ -159,6 +161,7 @@ impl<'a> Ctx<'a> {
     pub const PARSING: Timer = Timer::Parsing;
     pub const PART1: Timer = Timer::Part1;
     pub const PART2: Timer = Timer::Part2;
+    pub const PART12: Timer = Timer::Part12;
 
     fn new(name: &'a str, input: &'a str, bench: bool, writer: Option<&'a mut dyn Write>) -> Ctx<'a> {
         let now = Instant::now();
@@ -168,7 +171,7 @@ impl<'a> Ctx<'a> {
             start: now,
             start_part: now,
             input: Some(input),
-            timers: [Duration::default(); 4],
+            timers: [Duration::default(); 5],
             bench,
             nlseen: true,
         }

@@ -1,6 +1,17 @@
+use runner::*;
+
+pub fn start(ctx: &mut Ctx) {
+    let input = ctx.input();
+
+    part1a(ctx, input);
+    ctx.update_timer(Ctx::PART1);
+
+    part2a(ctx, input);
+    ctx.update_timer(Ctx::PART2);
+}
 
 // Match driven solution.
-pub fn part1(input: &str) {
+pub fn part1(ctx: &mut Ctx, input: &str) {
     let s = input.trim().split("\n").map(|line| match line {
         "A X" => 1 + 3,     // rock rock: draw
         "A Y" => 2 + 6,     // rock paper: win
@@ -13,11 +24,11 @@ pub fn part1(input: &str) {
         "C Z" => 3 + 3,     // scissors scissors: draw
         _ => panic!("unexpected: {}", line),
     }).sum::<u64>();
-    println!("part1: score {}", s);
+    outputln!(ctx, "part1: score {}", s);
 }
 
 // Match driven solution.
-pub fn part2(input: &str) {
+pub fn part2(ctx: &mut Ctx, input: &str) {
     let s = input.trim().split("\n").map(|line| match line {
         "A X" => 3 + 0,     // lose: scissors
         "A Y" => 1 + 3,     // draw: rock
@@ -30,21 +41,21 @@ pub fn part2(input: &str) {
         "C Z" => 1 + 6,     // win: rock
         _ => panic!("unexpected: {}", line),
     }).sum::<u64>();
-    println!("part2: score {}", s);
+    outputln!(ctx, "part2: score {}", s);
 }
 
 // Table driven solution.
-pub fn part1a(input: &str) {
+pub fn part1a(ctx: &mut Ctx, input: &str) {
     let table = [ 4, 8, 3, 1, 5, 7, 7, 2, 6 ];
     let s = input.as_bytes().chunks(4).map(|b|
         table[((b[0] - b'A') * 3 + b[2] - b'X') as usize]).sum::<u64>();
-    println!("part1: score {}", s);
+    outputln!(ctx, "part1: score {}", s);
 }
 
 // Table driven solution.
-pub fn part2a(input: &str) {
+pub fn part2a(ctx: &mut Ctx, input: &str) {
     let table = [ 3, 4, 8, 1, 5, 9, 2, 6, 7 ];
     let s = input.as_bytes().chunks(4).map(|b|
         table[((b[0] - b'A') * 3 + b[2] - b'X') as usize]).sum::<u64>();
-    println!("part2: score {}", s);
+    outputln!(ctx, "part2: score {}", s);
 }

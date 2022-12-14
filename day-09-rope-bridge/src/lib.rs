@@ -1,19 +1,17 @@
-use std::time::Instant;
+use runner::*;
 
-pub fn part1_2(input: &str) {
-    let now = Instant::now();
+pub fn start(ctx: &mut Ctx) {
+    let input = ctx.input();
     let mut stepper = Stepper::new(input);
-    println!("parsing: {:?}", now.elapsed());
+    ctx.update_timer(Ctx::PARSING);
 
-    let now = Instant::now();
     stepper.run(2);
-    println!("part1: {}", stepper.visited.len());
-    println!("part1: {:?}", now.elapsed());
+    outputln!(ctx, "part1: {}", stepper.visited.len());
+    ctx.update_timer(Ctx::PART1);
 
-    let now = Instant::now();
     stepper.run(10);
-    println!("part2: {}", stepper.visited.len());
-    println!("part2: {:?}", now.elapsed());
+    outputln!(ctx, "part2: {}", stepper.visited.len());
+    ctx.update_timer(Ctx::PART2);
 }
 
 #[derive(Default, Clone, Copy, Hash, PartialEq, Eq)]
