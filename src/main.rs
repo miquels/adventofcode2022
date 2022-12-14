@@ -2,6 +2,9 @@ use std::time::Duration;
 use clap::Parser;
 use runner::Runner;
 
+#[global_allocator]
+static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
+
 const DAYS: &'static [(u32, &str, fn(&mut runner::Ctx))] = &[
     ( 1, "day-01-calorie-counting", day_01::start ),
     ( 13, "day-13-distress-signal", day_13::start ),
