@@ -25,7 +25,6 @@ pub fn start(ctx: &mut Ctx) {
 #[derive(Default)]
 struct Cave {
     grid: Vec<Vec<u8>>,
-    max_x: usize,
     max_y: usize,
     part: usize,
 }
@@ -48,11 +47,6 @@ impl Cave {
                     .tuple_windows::<(_, _)>()
                     .for_each(|(from, to)| cave.draw(from, to));
             });
-
-        for y in 0 ..= cave.max_y {
-            cave.grid[y].resize(cave.max_x + 1, b'.');
-        }
-
         cave
     }
 
@@ -63,9 +57,7 @@ impl Cave {
             .for_each(|y| {
                 y.iter_mut().for_each(|x| if *x == b'o' { *x = b'.' });
             });
-        let mut l1 = Vec::new();
-        l1.resize(self.max_x + 1, b'.');
-        self.grid.push(l1);
+        self.grid.push(Vec::new());
         self.max_y += 2;
         self.part = 2;
     }
@@ -74,18 +66,16 @@ impl Cave {
         if self.part == 2 && y == self.max_y {
             return b'#';
         }
-        if x > self.max_x {
-            if self.part == 1 {
-                return b'#';
-            }
-            if self.grid[y].len() <= x {
-                self.grid[y].resize(x + 1, b'.');
-            }
+        if x >= self.grid[y].len() {
+            return b'.';
         }
         self.grid[y][x]
     }
 
     fn elem_set(&mut self, x: usize, y: usize, val: u8) {
+        if self.grid[y].len() <= x {
+            self.grid[y].resize(x + 1, b'.');
+        }
         self.grid[y][x] = val;
     }
 
@@ -128,9 +118,6 @@ impl Cave {
         if from.0 > to.0 || from.1 > to.1 {
             mem::swap(&mut from, &mut to);
         }
-        if to.0 > self.max_x {
-            self.max_x = to.0;
-        }
         if to.1 > self.max_y {
             self.max_y = to.1;
         }
@@ -142,14 +129,6 @@ impl Cave {
                 self.grid[y].resize(to.0 + 1, b'.');
             }
             self.grid[y][from.0 ..= to.0].fill(b'#');
-        }
-    }
-
-    #[allow(dead_code)]
-    fn debug(&self) {
-        for y in 0 .. self.grid.len() {
-            let s = self.grid[y].iter().map(|&c| c as char).collect::<String>();
-            println!("{}", s);
         }
     }
 }
