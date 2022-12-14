@@ -120,7 +120,9 @@ where
             let t = now.duration_since(ctx.start);
             if t < fastest_elapsed {
                 fastest_elapsed = t;
-                mem::swap(&mut fastest_output, &mut output);
+                if self.delayed {
+                    mem::swap(&mut fastest_output, &mut output);
+                }
             }
             if !self.bench || now.duration_since(start) >= duration {
                 break;
