@@ -25,3 +25,4 @@ day-11 = { path = "day-11-monkey-in-the-middle", version = "0.1.0" }
 day-12 = { path = "day-12-hill-climbing-algorithm", version = "0.1.0" }
 day-13 = { path = "day-13-distress-signal", version = "0.1.0" }
 day-14 = { path = "day-14-regolith-reservoir", version = "0.1.0" }
+day-15 = { path = "day-15-beacon-exclusion-zone", version = "0.1.0" }
