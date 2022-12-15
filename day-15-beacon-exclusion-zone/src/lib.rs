@@ -66,44 +66,45 @@ impl Grid {
         Grid { sensors }
     }
 
-    fn get_raw_ranges_at_y(&self, y: i32, rm_beacons: bool) -> Ranges {
-        let mut set = Ranges::default();
+    fn get_ranges_at_y(&self, y: i32) -> Ranges {
+        let mut ranges = Ranges::default();
         for r in self.sensors.iter().filter_map(|s| s.range_on_y(y)) {
-            set.insert(Range{ start: r.0, end: r.1, x: 0 });
+            ranges.insert(Range{ start: r.0, end: r.1 });
         }
-        if rm_beacons {
-            for r in self.sensors.iter().filter(|s| s.by == y).map(|s| s.bx) {
-                set.remove(r);
-            }
+        ranges
+    }
+
+    fn remove_beacons_from_ranges(&self, ranges: &mut Ranges, y: i32) {
+        for r in self.sensors.iter().filter(|s| s.by == y).map(|s| s.bx) {
+            ranges.remove(r);
         }
-        set
     }
 
     fn no_beacons_at_y(&self, y: i32) -> i32 {
-        let mut r = self.get_raw_ranges_at_y(y, true);
-        r.merge();
+        let mut r = self.get_ranges_at_y(y);
+        self.remove_beacons_from_ranges(&mut r, y);
+        r.sort();
         r.len()
     }
 
     fn find_gap_brute_force(&self, limit: i32) -> u64 {
         for y in 0 ..= limit {
-            let mut r = self.get_raw_ranges_at_y(y, false);
+            let mut r = self.get_ranges_at_y(y);
             r.clamp(0, limit);
-            r.merge();
-            if r.num_ranges() != 1 {
-                return (r.r[0].end + 1) as u64 * 4000000 + y as u64;
+            r.sort();
+            if let Some(pos) = r.find_gap_pos() {
+                return pos as u64 * 4000000 + y as u64;
             }
         }
         panic!("find_gap: FAIL");
     }
 }
 
-// an inclusive from ..= to range, with a extra payload 'x'.
+// an inclusive from ..= to range
 #[derive(Debug, Clone, Copy)]
 struct Range {
     start: i32,
     end: i32,
-    x: i32,
 }
 
 // A set of inclusive ranges.
@@ -139,12 +140,6 @@ impl Ranges {
             if r.start < low {
                 r.start = low;
             }
-            if r.start > high {
-                r.end = r.start - 1;
-            }
-            if r.end < low {
-                r.end = r.start - 1;
-            }
             if r.end > high {
                 r.end = high;
             }
@@ -152,43 +147,44 @@ impl Ranges {
     }
 
     // Remove empty ranges, then sort.
-    fn clean(&mut self) {
+    fn sort(&mut self) {
         self.r.sort_unstable_by(|a, b| a.start.cmp(&b.start));
         self.r.retain(|r| r.start <= r.end);
     }
 
-    // Merge ranges, remove ranges of length 0.
-    fn merge(&mut self) {
-        self.clean();
-        let mut n1 = 0;
-        let mut n2 = 1;
-        while n2 < self.r.len() {
-            if self.r[n1].end >= self.r[n2].end {
-                // skip
-                n2 += 1;
-            } else if self.r[n1].end >= self.r[n2].start {
-                // merge
-                self.r[n1].end = self.r[n2].end;
-                n2 += 1;
-            } else {
-                // advance
-                self.r[n1 + 1] = self.r[n2];
-                n1 += 1;
-                n2 += 1;
+    // Sum of length of all ranges. Parts that overlap are not counted twice.
+    // - Only useful after clean().
+    fn len(&self) -> i32 {
+        if self.r.len() == 0 {
+            return 0;
+        }
+        let mut len = 0;
+        let mut start = self.r[0].start;
+        for r in &self.r {
+            if r.start > start {
+                len += r.end - r.start + 1;
+                start = r.end + 1;
+            } else if r.end >= start {
+                len += r.end - start + 1;
+                start = r.end + 1;
             }
         }
-        self.r.truncate(n1 + 1);
+        len
     }
 
-    // Sum of length of all ranges.
-    // Only useful after merge().
-    fn len(&self) -> i32 {
-        self.r.iter().fold(0i32, |acc, x| acc + (x.end - x.start) + 1)
-    }
-
-    // Number of ranges.
-    // Only useful after merge().
-    fn num_ranges(&self) -> i32 {
-        self.r.len() as i32
+    // See if there is a gap somewhere.
+    fn find_gap_pos(&self) -> Option<i32> {
+        if self.r.len() == 0 {
+            return None;
+        }
+        let mut start = self.r[0].start;
+        for r in &self.r {
+            if r.start > start {
+                return Some(start);
+            } else if r.end >= start {
+                start = r.end + 1;
+            }
+        }
+        None
     }
 }
