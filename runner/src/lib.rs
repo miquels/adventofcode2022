@@ -102,6 +102,8 @@ where
     pub fn run(&mut self) {
         let start = Instant::now();
         let duration = Duration::from_millis(250);
+        let min_times = 3;
+        let mut times = 0;
         let mut fastest_elapsed = Duration::from_secs(11111);
         let mut fastest_output = Some(String::new());
         let mut output = self.delayed.then(|| String::new());
@@ -126,7 +128,8 @@ where
                     mem::swap(&mut fastest_output, &mut output);
                 }
             }
-            if !self.bench || now.duration_since(start) >= duration {
+            times += 1;
+            if !self.bench || (now.duration_since(start) >= duration && times >= min_times) {
                 break;
             }
         }
