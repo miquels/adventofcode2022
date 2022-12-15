@@ -5,6 +5,5 @@ authors = ["Miquel van Smoorenburg <mike@langeraar.net>"]
 edition = "2021"
 
 [dependencies]
-btree-range-map = "0.5.0"
 itertools = "0.10"
 runner = { path = "../runner", version = "0.1" }
