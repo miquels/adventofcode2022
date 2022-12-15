@@ -48,42 +48,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
-name = "btree-range-map"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "def3a109c2af9d583d0cba192ea3b8a1c62690f795d5e012d75a350322ce12e4"
-dependencies = [
- "btree-slab",
- "cc-traits",
- "range-traits",
- "slab",
-]
-
-[[package]]
-name = "btree-slab"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cbd15ebdf1711bae315f668ac8865d35754613955f6473515b6aa2762ea2ec86"
-dependencies = [
- "cc-traits",
- "slab",
- "smallvec",
-]
-
-[[package]]
 name = "cc"
 version = "1.0.77"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e9f73505338f7d905b19d18738976aae232eb46b8efc15554ffc56deb5d9ebe4"
-
-[[package]]
-name = "cc-traits"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "becb23f44ae9dd141d637d520b908c291bf4c5eed016ca368daa1430d54ebf4c"
-dependencies = [
- "slab",
-]
 
 [[package]]
 name = "clap"
@@ -229,7 +197,6 @@ dependencies = [
 name = "day-15"
 version = "0.1.0"
 dependencies = [
- "btree-range-map",
  "itertools",
  "runner",
 ]
@@ -483,12 +450,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "range-traits"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9ea26694da042b4016873b8c55515348f40d77281f239ade1f2ede3afb8da92c"
-
-[[package]]
 name = "regex"
 version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -537,21 +498,6 @@ checksum = "0b53b0a5db882a8e2fdaae0a43f7b39e7e9082389e978398bdf223a55b581248"
 dependencies = [
  "regex",
 ]
-
-[[package]]
-name = "slab"
-version = "0.4.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4614a76b2a8be0058caa9dbbaf66d988527d86d003c11a94fbd335d7661edcef"
-dependencies = [
- "autocfg",
-]
-
-[[package]]
-name = "smallvec"
-version = "1.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a507befe795404456341dfab10cef66ead4c041f62b8b11bbb92bffe5d0953e0"
 
 [[package]]
 name = "strsim"
