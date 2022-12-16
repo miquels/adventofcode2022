@@ -21,6 +21,7 @@ const DAYS: &'static [(u32, &str, fn(&mut runner::Ctx))] = &[
     ( 13, "day-13-distress-signal", day_13::start ),
     ( 14, "day-14-regolith-reservoir", day_14::start ),
     ( 15, "day-15-beacon-exclusion-zone", day_15::start ),
+    ( 16, "day-16-proboscidea-volcanium", day_16::start ),
     ( 105, "day-05-supply-stacks", day_05::start_heavy_duty ),
 ];
 

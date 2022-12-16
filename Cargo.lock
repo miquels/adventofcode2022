@@ -31,6 +31,7 @@ dependencies = [
  "day-13",
  "day-14",
  "day-15",
+ "day-16",
  "jemallocator",
  "runner",
 ]
@@ -198,6 +199,13 @@ name = "day-15"
 version = "0.1.0"
 dependencies = [
  "itertools",
+ "runner",
+]
+
+[[package]]
+name = "day-16"
+version = "0.1.0"
+dependencies = [
  "runner",
 ]
 
